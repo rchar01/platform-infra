@@ -6,6 +6,15 @@ This file gives a short, release-oriented view of what changed between versions.
 
 No unreleased changes.
 
+## v1.1.0 - 2026-05-17
+
+Branding update.
+
+Highlights:
+
+- Added project logo assets.
+- Displayed the transparent project logo in the README.
+
 ## v1.0.0 - 2026-05-17
 
 Initial public release of `platform-infra`.

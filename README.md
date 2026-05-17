@@ -1,14 +1,18 @@
 # platform-infra
 
+<div align="center">
+  <img src="assets/brand/platform-infra-forge-avatar-transparent-512.png" width="256" alt="platform-infra logo">
+</div>
+
 `platform-infra` provisions Proxmox VMs with OpenTofu. It owns whether a VM exists and what virtual hardware, network attachment, initial cloud-init access, and handoff outputs it has.
 
 It does not build templates, configure operating systems after boot, deploy applications, or manage Kubernetes tooling.
 
 ## Release Status
 
-`v1.0.0` is the initial public release of `platform-infra`.
+The latest documented release is `v1.1.0`.
 
-This release provides:
+The initial `v1.0.0` release provides:
 
 - Independent `homelab` and `dev` OpenTofu roots.
 - A reusable Proxmox VM module for cloning from existing templates.
