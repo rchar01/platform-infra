@@ -1,0 +1,40 @@
+proxmox_endpoint       = "https://192.168.100.10:8006/api2/json"
+proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"
+proxmox_insecure       = true
+proxmox_node           = "pve"
+
+default_bridge               = "vmbr0"
+default_datastore            = "local-lvm"
+default_cloud_init_datastore = "local-lvm"
+default_dns_servers          = ["192.168.100.1"]
+default_dns_search_domain    = "homelab"
+template_vm_id               = 9003
+
+ssh_public_key_file = "~/.ssh/platform-infra-dev-cloud-init_ed25519.pub"
+cloud_init_username = "rocky"
+agent_enabled       = true
+
+vms = {
+  dev-bastion-01 = {
+    vm_id       = 160
+    hostname    = "dev-bastion-01.homelab"
+    description = "Development bastion VM"
+    tags        = ["rocky", "bastion", "dev"]
+
+    cores     = 2
+    cpu_type  = "host"
+    memory_mb = 4096
+    memory_floating_mb = 2867
+    disk_gb   = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 15
+      }
+    ]
+
+    ipv4         = "192.168.100.60/24"
+    ipv4_gateway = "192.168.100.1"
+  }
+}

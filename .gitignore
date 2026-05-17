@@ -1,0 +1,38 @@
+# Optional repo-local tool installs, commonly used by CI via TOFU_INSTALL_DIR.
+.tools/
+
+# OpenTofu working directories created by init.
+.terraform/
+
+# OpenTofu state and local state lock files must not be committed.
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# OpenTofu plan artifacts may expose infrastructure details.
+*.tfplan
+*.tfplan.json
+
+# OpenTofu crash logs are local diagnostics.
+crash.log
+crash.*.log
+
+# OpenTofu variable files may contain API tokens or environment-specific values.
+*.tfvars
+*.tfvars.json
+
+# Local platform-tools SSH config files may contain workstation-specific paths.
+environments/*/ssh/*.env
+!environments/*/ssh/*.env.example
+
+# Local token files are supported for escape hatches but should not be committed.
+environments/*/proxmox-api-token
+
+# OpenTofu override files are local-only customization hooks.
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Keep provider dependency locks committed for reproducible init.
+!.terraform.lock.hcl
