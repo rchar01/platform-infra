@@ -10,9 +10,9 @@ The normal private workflow uses:
 
 - `../../../platform-private/infra/dev.tfvars`.
 - `../../../platform-private/infra/dev.tofu.env`.
-- `../../../platform-private/infra/ssh/dev-cloud-init.env`.
-
 Source `dev.tofu.env` from this root before native OpenTofu operations. It supplies `dev.tfvars` and `config_root` through OpenTofu CLI args.
+
+Run `make init-ssh ENV=dev PRIVATE=1` from the repository root after editing `dev.tfvars`. It generates one cloud-init SSH keypair per VM using the default `~/.ssh/platform-infra-dev-<vm-key>-cloud-init_ed25519` path pattern.
 
 OpenTofu auto-loads `terraform.tfvars` from this directory. If using the private workflow, keep local `terraform.tfvars` absent or free of conflicting token-related values.
 

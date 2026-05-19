@@ -34,17 +34,9 @@ copy_if_missing() {
 
 require_var TFVARS
 require_var TFVARS_EXAMPLE
-require_var SSH_CONFIG
-require_var SSH_CONFIG_EXAMPLE
 
 copy_if_missing \
   "${TFVARS_EXAMPLE}" \
   "${TFVARS}" \
   "Created ${TFVARS}; edit real Proxmox values before planning or applying" \
   "${TFVARS} already exists"
-
-copy_if_missing \
-  "${SSH_CONFIG_EXAMPLE}" \
-  "${SSH_CONFIG}" \
-  "Created ${SSH_CONFIG}; edit SSH key settings before running make init-ssh" \
-  "${SSH_CONFIG} already exists"

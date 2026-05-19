@@ -4,7 +4,7 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-No unreleased changes.
+- `make init-ssh` now creates per-VM cloud-init SSH keys instead of one environment-wide key.
 
 ## v1.1.0 - 2026-05-17
 

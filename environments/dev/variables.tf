@@ -68,16 +68,16 @@ variable "template_vm_id" {
   type        = number
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key injected through cloud-init. Prefer ssh_public_key_file for local use."
+variable "cloud_init_ssh_key_dir" {
+  description = "Directory containing generated per-VM cloud-init SSH private keys. Public keys are read from matching .pub files."
   type        = string
-  default     = null
+  default     = "~/.ssh"
 }
 
-variable "ssh_public_key_file" {
-  description = "Path to the SSH public key injected through cloud-init. Relative paths are resolved from config_root."
+variable "cloud_init_ssh_key_prefix" {
+  description = "Prefix for generated per-VM cloud-init SSH key names."
   type        = string
-  default     = null
+  default     = "platform-infra"
 }
 
 variable "cloud_init_username" {
@@ -121,6 +121,9 @@ variable "vms" {
     ipv4_gateway            = optional(string)
     dns_servers             = optional(list(string))
     dns_search_domain       = optional(string)
+    ssh_private_key_file    = optional(string)
+    ssh_public_key          = optional(string)
+    ssh_public_key_file     = optional(string)
     cloud_init_username     = optional(string)
     agent_enabled           = optional(bool)
     cpu_type                = optional(string)

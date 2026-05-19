@@ -10,9 +10,9 @@ The normal private workflow uses:
 
 - `../../../platform-private/infra/homelab.tfvars`.
 - `../../../platform-private/infra/homelab.tofu.env`.
-- `../../../platform-private/infra/ssh/homelab-cloud-init.env`.
-
 Source `homelab.tofu.env` from this root before native OpenTofu operations. It supplies `homelab.tfvars` and `config_root` through OpenTofu CLI args.
+
+Run `make init-ssh ENV=homelab PRIVATE=1` from the repository root after editing `homelab.tfvars`. It generates one cloud-init SSH keypair per VM using the default `~/.ssh/platform-infra-homelab-<vm-key>-cloud-init_ed25519` path pattern.
 
 OpenTofu auto-loads `terraform.tfvars` from this directory. If using the private workflow, keep local `terraform.tfvars` absent or free of conflicting token-related values.
 

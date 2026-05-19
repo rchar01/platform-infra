@@ -103,7 +103,7 @@ In scope:
 - CPU, RAM, boot disk size, and additional virtual disks.
 - Datastore, node, and network bridge selection.
 - Initial cloud-init user.
-- SSH public key injection.
+- Per-VM SSH public key injection.
 - DHCP or static IP intent.
 - DNS server and search-domain intent.
 - VM tags and descriptions.
@@ -141,8 +141,6 @@ The normal operator workflow uses a sibling private repository for environment v
   dev.tfvars
   homelab.tofu.env
   dev.tofu.env
-  ssh/homelab-cloud-init.env
-  ssh/dev-cloud-init.env
 ```
 
 Secrets and key material stay outside Git:
@@ -170,7 +168,7 @@ To remove managed VMs, use the destroy workflow in `docs/workflow.md` from the s
 
 ## Secrets Policy
 
-Never commit real environment values, generated state, Proxmox tokens, SSH private keys, local SSH config env files, or saved plan files.
+Never commit real environment values, generated state, Proxmox tokens, SSH private keys, or saved plan files.
 
 Commit `.terraform.lock.hcl` after `tofu init` succeeds so provider dependency changes can be reviewed.
 

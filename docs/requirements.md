@@ -21,7 +21,7 @@ Use `TOFU_INSTALL_DIR` to choose a different binary directory. CI commonly keeps
 Recommended shared platform tools:
 
 - `platform-proxmox-token-init` from `platform-tools` for Proxmox API user/token bootstrap over SSH from the operator workstation.
-- `platform-ssh-init` from `platform-tools` for cloud-init SSH keypair creation.
+- `platform-ssh-init` from `platform-tools` for per-VM cloud-init SSH keypair creation.
 
 Recommended local inputs:
 
@@ -45,7 +45,7 @@ Proxmox API token bootstrap additionally needs SSH access to the Proxmox host as
 
 The Proxmox API token can be provided directly with `proxmox_api_token`, but local runs should prefer `proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"`. Keep that file outside Git with `0600` permissions.
 
-Private repository configs should not contain the token value. They may contain normal private configuration such as `homelab.tfvars`, `dev.tfvars`, `homelab.tofu.env`, `dev.tofu.env`, `ssh/homelab-cloud-init.env`, and `ssh/dev-cloud-init.env`.
+Private repository configs should not contain the token value. They may contain normal private configuration such as `homelab.tfvars`, `dev.tfvars`, `homelab.tofu.env`, and `dev.tofu.env`.
 
 See `proxmox-api-token.md` for the exact Proxmox user, token, and ACL setup expected by the first apply.
 
@@ -72,7 +72,7 @@ CI plans that contact Proxmox additionally need:
 - Access to the target Proxmox API endpoint.
 - `TF_VAR_proxmox_api_token` injected from the CI secret store.
 - Matching private tfvars for the selected environment.
-- Valid SSH public key input for cloud-init.
+- Valid per-VM SSH public key input for cloud-init.
 - Access to the selected environment state.
 
 CI applies additionally require remote state with locking, protected deployment jobs, and manual approval. Do not run apply from an ephemeral runner using local state.
@@ -101,7 +101,7 @@ In this repository, cloud-init is limited to initial identity and access:
 
 - Hostname.
 - Initial user.
-- SSH public key injection.
+- Per-VM SSH public key injection.
 - DHCP or static IP intent.
 - DNS server and search-domain intent.
 - Proxmox-side guest agent flag.

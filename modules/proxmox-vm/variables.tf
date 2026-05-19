@@ -120,6 +120,11 @@ variable "dns_search_domain" {
 variable "ssh_public_key" {
   description = "SSH public key injected into the cloud-init user account."
   type        = string
+
+  validation {
+    condition     = length(trimspace(var.ssh_public_key)) > 0
+    error_message = "ssh_public_key must not be empty. Run make init-ssh for the selected environment or set a per-VM ssh_public_key/ssh_public_key_file override."
+  }
 }
 
 variable "cloud_init_username" {

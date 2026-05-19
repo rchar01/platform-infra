@@ -29,7 +29,7 @@ platform-template-builder -> platform-infra -> platform-config
 - Use `environments/homelab` only with `homelab.tfvars` and homelab state.
 - Use `environments/dev` only with `dev.tfvars` and dev state.
 - Do not keep a local `environments/<env>/terraform.tfvars` file for the normal private workflow.
-- Do not commit real tfvars, state files, plan files, Proxmox tokens, SSH private keys, or local SSH config env files.
+- Do not commit real tfvars, state files, plan files, Proxmox tokens, or SSH private keys.
 - Run `tofu apply` and `tofu destroy` only after reviewing the selected environment and plan.
 
 OpenTofu automatically loads `terraform.tfvars` from the current root. A stale local file can conflict with the private tfvars supplied by `../platform-private/infra/<env>.tfvars`.
@@ -100,7 +100,7 @@ tofu@pve!homelab=TOKEN_SECRET
 
 If the local token file is already non-empty, the automatic workflow refuses to overwrite it. Use `--force` only when intentionally replacing the token file. If the token already exists in Proxmox, Proxmox cannot show the existing secret; delete and recreate the token if the secret was lost.
 
-Create or refresh the private homelab config and SSH key config:
+Create or refresh the private homelab config and per-VM cloud-init SSH keys:
 
 ```bash
 make env ENV=homelab PRIVATE=1
@@ -108,7 +108,7 @@ $EDITOR ../platform-private/infra/homelab.tfvars
 make init-ssh ENV=homelab PRIVATE=1
 ```
 
-Create or refresh the private dev config and SSH key config when needed:
+Create or refresh the private dev config and per-VM cloud-init SSH keys when needed:
 
 ```bash
 make env ENV=dev PRIVATE=1
@@ -130,11 +130,17 @@ Expected private layout:
   dev.tfvars
   homelab.tofu.env
   dev.tofu.env
-  ssh/homelab-cloud-init.env
-  ssh/dev-cloud-init.env
 ```
 
 The `.tofu.env` files contain no secrets. They set `TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy` so local operator commands use the matching private tfvars and `config_root`.
+
+`make init-ssh` reads the selected environment's `vms` map and generates one local cloud-init SSH keypair per VM with `platform-ssh-init`. The default key path pattern is:
+
+```text
+~/.ssh/platform-infra-<env>-<vm-key>-cloud-init_ed25519
+```
+
+OpenTofu reads the matching `.pub` file for each VM during planning and injects it through cloud-init. The private key path is exposed in `ansible_inventory_map` for `platform-config` handoff.
 
 ## Homelab Workflow
 
@@ -169,6 +175,8 @@ Inspect outputs for handoff to `platform-config`:
 ```bash
 ~/.local/bin/tofu output
 ```
+
+The `ansible_inventory_map` output includes `ansible_host`, `ansible_user`, and `ansible_ssh_private_key_file` values for each VM.
 
 ## Dev Workflow
 

@@ -30,7 +30,7 @@ module "vm" {
   dns_servers       = coalesce(each.value.dns_servers, var.default_dns_servers)
   dns_search_domain = coalesce(each.value.dns_search_domain, var.default_dns_search_domain)
 
-  ssh_public_key      = local.ssh_public_key
+  ssh_public_key      = local.ssh_public_keys[each.key]
   cloud_init_username = coalesce(each.value.cloud_init_username, var.cloud_init_username)
   agent_enabled       = coalesce(each.value.agent_enabled, var.agent_enabled)
 }

@@ -11,9 +11,9 @@ TFVARS_EXAMPLE := $(ENV_DIR)/terraform.tfvars.example
 TFVARS_ABS := $(abspath $(TFVARS))
 CONFIG_ROOT_ABS := $(abspath $(CONFIG_ROOT))
 
-SSH_CONFIG ?= $(if $(PRIVATE),$(CONFIG_ROOT)/ssh/$(ENV)-cloud-init.env,$(CONFIG_ROOT)/ssh/cloud-init.env)
-SSH_CONFIG_EXAMPLE := $(ENV_DIR)/ssh/cloud-init.env.example
 PLATFORM_SSH_INIT ?= platform-ssh-init
+SSH_KEY_DIR ?= ~/.ssh
+SSH_KEY_PREFIX ?= platform-infra
 TOFU_VERSION ?= 1.11.7
 TOFU_INSTALL_DIR ?= $(HOME)/.local/bin
 TOFU_BIN ?= $(TOFU_INSTALL_DIR)/tofu
@@ -40,7 +40,8 @@ help:
 	@printf '  %-24s %s\n' 'PRIVATE' 'Use ../platform-private/infra config when set, default: empty'
 	@printf '  %-24s %s\n' 'CONFIG_ROOT' 'Config root, default: environments/$(ENV) or ../platform-private/infra'
 	@printf '  %-24s %s\n' 'TFVARS' 'OpenTofu var file, default follows CONFIG_ROOT'
-	@printf '  %-24s %s\n' 'SSH_CONFIG' 'platform-ssh-init config, default follows ENV and PRIVATE'
+	@printf '  %-24s %s\n' 'SSH_KEY_DIR' 'Directory for generated per-VM SSH keys, default: ~/.ssh'
+	@printf '  %-24s %s\n' 'SSH_KEY_PREFIX' 'Prefix for generated per-VM SSH keys, default: platform-infra'
 	@printf '  %-24s %s\n' 'TOFU_VERSION' 'OpenTofu version, default: 1.11.7'
 	@printf '  %-24s %s\n' 'TOFU_INSTALL_DIR' 'Directory for tofu, default: $(HOME)/.local/bin'
 	@printf '  %-24s %s\n' 'TOFU_BIN' 'OpenTofu binary path, default: $(TOFU_INSTALL_DIR)/tofu'
@@ -58,17 +59,19 @@ _install-tofu:
 ## Install and check local dependencies
 deps: _install-tofu
 
-## Create tfvars and SSH config from examples if missing
+## Create tfvars from example if missing
 env:
 	@TFVARS="$(TFVARS)" \
 	TFVARS_EXAMPLE="$(TFVARS_EXAMPLE)" \
-	SSH_CONFIG="$(SSH_CONFIG)" \
-	SSH_CONFIG_EXAMPLE="$(SSH_CONFIG_EXAMPLE)" \
 	sh scripts/create-env-config.sh
 
-## Initialize cloud-init SSH key with platform-tools
+## Initialize per-VM cloud-init SSH keys with platform-tools
 init-ssh:
-	@SSH_CONFIG="$(SSH_CONFIG)" \
+	@ENV="$(ENV)" \
+	ENV_DIR="$(ENV_DIR)" \
+	TFVARS="$(TFVARS_ABS)" \
+	SSH_KEY_DIR="$(SSH_KEY_DIR)" \
+	SSH_KEY_PREFIX="$(SSH_KEY_PREFIX)" \
 	PLATFORM_SSH_INIT="$(PLATFORM_SSH_INIT)" \
 	SSH_EMPTY_PASSPHRASE="$(SSH_EMPTY_PASSPHRASE)" \
 	sh scripts/init-cloud-init-ssh.sh

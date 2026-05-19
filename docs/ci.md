@@ -59,7 +59,7 @@ CI needs access to private environment values. Use one of these approaches:
 
 - Check out `platform-private` as a sibling directory beside `platform-infra`.
 - Materialize environment-specific tfvars from a secure CI secret or secret manager at runtime.
-- Keep SSH public key references valid for the runner, or pass `ssh_public_key` from a non-secret CI variable.
+- Keep per-VM SSH public key references valid for the runner, or pass per-VM `ssh_public_key` values from non-secret CI variables.
 
 The private tfvars file may contain internal VM names, IPs, bridge names, datastore names, and template IDs. Treat it as confidential even when it does not contain credentials.
 

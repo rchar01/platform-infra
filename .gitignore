@@ -21,10 +21,6 @@ crash.*.log
 *.tfvars
 *.tfvars.json
 
-# Local platform-tools SSH config files may contain workstation-specific paths.
-environments/*/ssh/*.env
-!environments/*/ssh/*.env.example
-
 # Local token files are supported for escape hatches but should not be committed.
 environments/*/proxmox-api-token
 

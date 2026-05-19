@@ -30,16 +30,18 @@ output "ansible_inventory_map" {
   description = "Structured output for later platform-config inventory generation."
   value = {
     for name, vm in var.vms : name => {
-      hostname          = vm.hostname
-      ipv4              = vm.ipv4
-      primary_ip        = vm.ipv4 == "dhcp" ? null : split("/", vm.ipv4)[0]
-      ansible_host      = vm.ipv4 == "dhcp" ? null : split("/", vm.ipv4)[0]
-      user              = coalesce(vm.cloud_init_username, var.cloud_init_username)
-      vm_id             = vm.vm_id
-      agent_enabled     = coalesce(vm.agent_enabled, var.agent_enabled)
-      dns_servers       = coalesce(vm.dns_servers, var.default_dns_servers)
-      dns_search_domain = coalesce(vm.dns_search_domain, var.default_dns_search_domain)
-      additional_disks  = vm.additional_disks
+      hostname                     = vm.hostname
+      ipv4                         = vm.ipv4
+      primary_ip                   = vm.ipv4 == "dhcp" ? null : split("/", vm.ipv4)[0]
+      ansible_host                 = vm.ipv4 == "dhcp" ? null : split("/", vm.ipv4)[0]
+      user                         = coalesce(vm.cloud_init_username, var.cloud_init_username)
+      ansible_user                 = coalesce(vm.cloud_init_username, var.cloud_init_username)
+      ansible_ssh_private_key_file = local.ssh_private_key_files[name]
+      vm_id                        = vm.vm_id
+      agent_enabled                = coalesce(vm.agent_enabled, var.agent_enabled)
+      dns_servers                  = coalesce(vm.dns_servers, var.default_dns_servers)
+      dns_search_domain            = coalesce(vm.dns_search_domain, var.default_dns_search_domain)
+      additional_disks             = vm.additional_disks
     }
   }
 }

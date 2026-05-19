@@ -114,7 +114,7 @@ If using `proxmox_api_token_file`, remember that relative paths are resolved fro
 
 ## Cloud-Init SSH Key Missing
 
-If `tofu plan` reports that the SSH public key file does not exist, create it with `platform-ssh-init`:
+If `tofu plan` reports that a per-VM SSH public key file does not exist, generate the environment keys with `platform-ssh-init` through the Make wrapper:
 
 ```bash
 make init-ssh PRIVATE=1
@@ -126,7 +126,13 @@ For local fallback config:
 make init-ssh
 ```
 
-Use `ENV=dev PRIVATE=1` for `../platform-private/infra/ssh/dev-cloud-init.env`.
+Use `ENV=dev PRIVATE=1` for dev keys.
+
+The default per-VM key path pattern is:
+
+```text
+~/.ssh/platform-infra-<env>-<vm-key>-cloud-init_ed25519
+```
 
 If `platform-ssh-init` is not installed, install `platform-tools` or pass the tool path:
 
@@ -153,7 +159,7 @@ Names are case-sensitive and environment-specific.
 
 ## Cloud-Init SSH Key Not Injected
 
-Confirm `ssh_public_key_file` points to a valid public key, or `ssh_public_key` contains a valid public key, and that the template supports cloud-init.
+Confirm the per-VM public key file exists, or that the VM has an explicit per-VM `ssh_public_key_file` or `ssh_public_key`, and that the template supports cloud-init.
 
 Confirm the login user matches `cloud_init_username`. The default is `rocky`.
 

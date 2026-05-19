@@ -42,7 +42,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 - `make env` and `make init-ssh` use local ignored config only for fallback testing; pass `PRIVATE=1` for the normal private workflow in `../platform-private/infra`.
 - Proxmox tokens for local operator runs normally live in `~/.config/platform-infrastructure/proxmox-token` with `0600` permissions and are referenced by `proxmox_api_token_file`; do not store token values in `platform-private`.
 - Proxmox API user/token bootstrap belongs in `platform-tools` (`platform-proxmox-token-init`), not in this repo. This repo consumes an existing token.
-- Cloud-init SSH keys are generated under `~/.ssh` by `platform-ssh-init`; private Git stores only the SSH config env file.
+- Per-VM cloud-init SSH keys are generated under `~/.ssh` by `platform-ssh-init`; private Git stores only non-secret config and references.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
 - For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root; it sets `TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy` with private config paths.
 - Do not run `dev.tfvars` from `environments/homelab` or `homelab.tfvars` from `environments/dev`.
