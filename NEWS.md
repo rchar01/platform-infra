@@ -4,7 +4,16 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
+No unreleased changes.
+
+## v1.2.0 - 2026-05-20
+
+Security and handoff workflow update.
+
+Highlights:
+
 - `make init-ssh` now creates per-VM cloud-init SSH keys instead of one environment-wide key.
+- OpenTofu now exposes per-VM Ansible SSH key paths in `ansible_inventory_map`.
 - Example tfvars now keep Proxmox API TLS verification enabled by default.
 
 ## v1.1.0 - 2026-05-17

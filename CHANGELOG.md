@@ -7,6 +7,10 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [1.2.0] - 2026-05-20
+
 ### Changed
 
 - `make init-ssh` now generates one cloud-init SSH keypair per VM from the selected environment `vms` map.

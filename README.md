@@ -10,7 +10,13 @@ It does not build templates, configure operating systems after boot, deploy appl
 
 ## Release Status
 
-The latest documented release is `v1.1.0`.
+The latest documented release is `v1.2.0`.
+
+The `v1.2.0` release provides:
+
+- Per-VM cloud-init SSH key generation through `make init-ssh`.
+- Per-VM SSH key handoff values in `ansible_inventory_map` for `platform-config`.
+- Public example tfvars with Proxmox API TLS verification enabled by default.
 
 The initial `v1.0.0` release provides:
 
