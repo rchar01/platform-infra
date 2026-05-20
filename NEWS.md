@@ -5,6 +5,7 @@ This file gives a short, release-oriented view of what changed between versions.
 ## Unreleased
 
 - `make init-ssh` now creates per-VM cloud-init SSH keys instead of one environment-wide key.
+- Example tfvars now keep Proxmox API TLS verification enabled by default.
 
 ## v1.1.0 - 2026-05-17
 

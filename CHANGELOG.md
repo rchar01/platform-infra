@@ -12,6 +12,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `make init-ssh` now generates one cloud-init SSH keypair per VM from the selected environment `vms` map.
 - OpenTofu now injects per-VM cloud-init SSH public keys by default and exposes matching private key paths in `ansible_inventory_map`.
 - Removed env-level cloud-init SSH config scaffolding from the Make workflow.
+- Example tfvars now keep Proxmox API TLS verification enabled by default.
 
 ## [1.1.0] - 2026-05-17
 

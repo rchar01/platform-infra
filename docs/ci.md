@@ -19,6 +19,8 @@ This mode is safe for public CI because it does not require `TF_VAR_proxmox_api_
 
 Plan jobs that contact Proxmox should run one environment at a time. Each job must use the matching OpenTofu root and the matching private tfvars file.
 
+CI Proxmox plan jobs should keep TLS verification enabled. Do not set `proxmox_insecure = true` in CI unless the runner network path and certificate trust model have been explicitly reviewed.
+
 Example homelab plan job body:
 
 ```bash

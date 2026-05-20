@@ -1,6 +1,6 @@
 proxmox_endpoint       = "https://192.168.100.10:8006/api2/json"
 proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"
-proxmox_insecure       = true
+proxmox_insecure       = false
 proxmox_node           = "pve"
 
 default_bridge               = "vmbr0"

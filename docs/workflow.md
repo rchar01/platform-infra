@@ -122,6 +122,8 @@ The private tfvars files should reference the token file path, not the token val
 proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"
 ```
 
+The scaffolded examples use `proxmox_insecure = false` so Proxmox API TLS verification is enabled by default. Prefer trusting the Proxmox API certificate from the operator workstation and CI runners. Use `proxmox_insecure = true` only as an explicit private/local override for a known self-signed setup after accepting the MITM and token exposure risk.
+
 Expected private layout:
 
 ```text

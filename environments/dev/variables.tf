@@ -23,7 +23,7 @@ variable "proxmox_api_token_file" {
 }
 
 variable "proxmox_insecure" {
-  description = "Allow insecure TLS connections to Proxmox. Useful for homelab self-signed certificates."
+  description = "Allow insecure TLS connections to Proxmox. Keep false unless an explicit private local override is required."
   type        = bool
   default     = false
 }
