@@ -374,6 +374,8 @@ See `ci.md` for the detailed CI reference.
 
 After apply, `platform-config` configures the running VM. It should consume outputs from this repository and must not be implemented here.
 
+The full downstream operator sequence is documented in `../platform-config/docs/operator-runbook.md`. That runbook covers Ansible environment files, Make targets, service order, smoke checks, and secret file locations.
+
 The first structured handoff output is:
 
 ```bash
