@@ -29,7 +29,7 @@ The initial `v1.0.0` release provides:
 - Make helpers for dependency install, config scaffolding, formatting, and validation.
 - Handoff outputs for later `platform-config` inventory generation.
 
-Public examples use documentation addresses from `192.168.100.0/24`; replace them with your own private values before planning or applying.
+Public examples use RFC 5737 documentation addresses from `192.0.2.0/24`; replace them with your own private values before planning or applying.
 
 ## Start Here
 

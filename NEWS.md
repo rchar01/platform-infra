@@ -6,6 +6,14 @@ This file gives a short, release-oriented view of what changed between versions.
 
 No unreleased changes.
 
+## v1.2.1 - 2026-05-21
+
+Maintenance fix for the SSH key initialization workflow.
+
+Highlights:
+
+- `make init-ssh` now defers `HOME` expansion for the default `SSH_KEY_DIR`, avoiding unsafe Make-time interpolation.
+
 ## v1.2.0 - 2026-05-20
 
 Security and handoff workflow update.

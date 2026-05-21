@@ -1,4 +1,4 @@
-proxmox_endpoint       = "https://192.168.100.10:8006/api2/json"
+proxmox_endpoint       = "https://192.0.2.10:8006/api2/json"
 proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"
 proxmox_insecure       = false
 proxmox_node           = "pve"
@@ -6,7 +6,7 @@ proxmox_node           = "pve"
 default_bridge               = "vmbr0"
 default_datastore            = "local-lvm"
 default_cloud_init_datastore = "local-lvm"
-default_dns_servers          = ["192.168.100.1"]
+default_dns_servers          = ["192.0.2.1"]
 default_dns_search_domain    = "homelab"
 template_vm_id               = 9003
 
@@ -15,9 +15,9 @@ cloud_init_username = "rocky"
 agent_enabled       = true
 
 vms = {
-  dev-bastion-01 = {
+  k8s-bastion-01 = {
     vm_id       = 160
-    hostname    = "dev-bastion-01.homelab"
+    hostname    = "k8s-bastion-01.example.test"
     description = "Development bastion VM"
     tags        = ["rocky", "bastion", "dev"]
 
@@ -34,7 +34,7 @@ vms = {
       }
     ]
 
-    ipv4         = "192.168.100.60/24"
-    ipv4_gateway = "192.168.100.1"
+    ipv4         = "192.0.2.60/24"
+    ipv4_gateway = "192.0.2.1"
   }
 }

@@ -21,7 +21,7 @@ Do not run `dev.tfvars` from this root. `environments/dev` has its own independe
 ## Notes
 
 - The template VM ID must already exist in Proxmox.
-- `terraform.tfvars.example` shows an example static development bastion at `192.168.100.50/24`.
+- `terraform.tfvars.example` shows an example static development bastion at `192.0.2.50/24`.
 - Extra virtual disks may be attached here; partitioning, formatting, LVM, mounts, and `fstab` belong in `platform-config`.
 - The actual DHCP lease is only available in outputs when `qemu-guest-agent` is installed and running in the guest and `agent_enabled = true`.
 - If the first test template does not have a working guest agent, set `agent_enabled = false` before applying.

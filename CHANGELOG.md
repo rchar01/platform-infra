@@ -9,6 +9,12 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 No unreleased changes.
 
+## [1.2.1] - 2026-05-21
+
+### Fixed
+
+- Avoided Make-time `HOME` expansion in the `init-ssh` SSH key directory default.
+
 ## [1.2.0] - 2026-05-20
 
 ### Changed
@@ -17,7 +23,6 @@ No unreleased changes.
 - OpenTofu now injects per-VM cloud-init SSH public keys by default and exposes matching private key paths in `ansible_inventory_map`.
 - Removed env-level cloud-init SSH config scaffolding from the Make workflow.
 - Example tfvars now keep Proxmox API TLS verification enabled by default.
-- Avoided Make-time `HOME` expansion in the `init-ssh` SSH key directory default.
 
 ## [1.1.0] - 2026-05-17
 
