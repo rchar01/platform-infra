@@ -65,7 +65,7 @@ OpenTofu also auto-loads `terraform.tfvars` from the current environment root. I
 
 ## Authentication Fails
 
-Check `proxmox_endpoint` in the selected tfvars file and the token file referenced by `proxmox_api_token_file`, normally `~/.config/platform-infrastructure/proxmox-token`.
+Check `proxmox_endpoint` in the selected tfvars file and the token file referenced by `proxmox_api_token_file`, normally `~/.config/platform-infrastructure/infra/proxmox.token`.
 
 The expected token shape is:
 
@@ -86,7 +86,7 @@ To check the automatic token-file workflow, include the token file path:
 ```bash
 platform-proxmox-token-init \
   --ssh root@<proxmox-ip> \
-  --write-token-file ~/.config/platform-infrastructure/proxmox-token \
+  --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token \
   --check
 ```
 
@@ -97,7 +97,7 @@ If you intentionally use a different realm, the token line must match it. For ex
 Confirm the token file exists, contains only the token value, and is readable only by your user:
 
 ```bash
-stat -c '%a %n' ~/.config/platform-infrastructure ~/.config/platform-infrastructure/proxmox-token
+stat -c '%a %n' ~/.config/platform-infrastructure ~/.config/platform-infrastructure/infra ~/.config/platform-infrastructure/infra/proxmox.token
 ```
 
 Verify the token against the Proxmox API from the operator workstation:
@@ -106,7 +106,7 @@ The `-k` flag below is for authentication diagnostics against an untrusted certi
 
 ```bash
 curl -kfsS \
-  -H "Authorization: PVEAPIToken=$(< ~/.config/platform-infrastructure/proxmox-token)" \
+  -H "Authorization: PVEAPIToken=$(< ~/.config/platform-infrastructure/infra/proxmox.token)" \
   https://<proxmox-ip>:8006/api2/json/version
 ```
 

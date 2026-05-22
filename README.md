@@ -8,27 +8,6 @@
 
 It does not build templates, configure operating systems after boot, deploy applications, or manage Kubernetes tooling.
 
-## Release Status
-
-The latest documented release is `v1.2.0`.
-
-The `v1.2.0` release provides:
-
-- Per-VM cloud-init SSH key generation through `make init-ssh`.
-- Per-VM SSH key handoff values in `ansible_inventory_map` for `platform-config`.
-- Public example tfvars with Proxmox API TLS verification enabled by default.
-
-The initial `v1.0.0` release provides:
-
-- Independent `homelab` and `dev` OpenTofu roots.
-- A reusable Proxmox VM module for cloning from existing templates.
-- CPU, memory, memory ballooning, boot disk, and additional disk shape.
-- Cloud-init hostname, initial user, SSH key, static IP or DHCP, and DNS intent.
-- Token-file based local Proxmox authentication without committing secrets.
-- Private tfvars workflow through a sibling `platform-private` repository.
-- Make helpers for dependency install, config scaffolding, formatting, and validation.
-- Handoff outputs for later `platform-config` inventory generation.
-
 Public examples use RFC 5737 documentation addresses from `192.0.2.0/24`; replace them with your own private values before planning or applying.
 
 ## Start Here
@@ -151,7 +130,7 @@ The normal operator workflow uses a sibling private repository for environment v
 
 Secrets and key material stay outside Git:
 
-- Proxmox token: `~/.config/platform-infrastructure/proxmox-token`.
+- Proxmox token: `~/.config/platform-infrastructure/infra/proxmox.token`.
 - SSH private keys: `~/.ssh`.
 - State files and plan files: ignored and not committed.
 

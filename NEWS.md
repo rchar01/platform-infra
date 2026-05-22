@@ -6,6 +6,15 @@ This file gives a short, release-oriented view of what changed between versions.
 
 No unreleased changes.
 
+## v1.2.2 - 2026-05-22
+
+Documentation and local secret path cleanup.
+
+Highlights:
+
+- `platform-config-init` is now documented as the normal way to create the local outside-Git config directory.
+- The documented Proxmox token file moved to `~/.config/platform-infrastructure/infra/proxmox.token`.
+
 ## v1.2.1 - 2026-05-21
 
 Maintenance fix for the SSH key initialization workflow.

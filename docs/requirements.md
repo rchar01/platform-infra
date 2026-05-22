@@ -20,6 +20,7 @@ Use `TOFU_INSTALL_DIR` to choose a different binary directory. CI commonly keeps
 
 Recommended shared platform tools:
 
+- `platform-config-init` from `platform-tools` for provisioning the local outside-Git config directory and placeholder secret files.
 - `platform-proxmox-token-init` from `platform-tools` for Proxmox API user/token bootstrap over SSH from the operator workstation.
 - `platform-ssh-init` from `platform-tools` for per-VM cloud-init SSH keypair creation.
 
@@ -44,7 +45,7 @@ Required Proxmox resources:
 
 Proxmox API token bootstrap additionally needs SSH access to the Proxmox host as a user that can run `pveum`, the `/etc/pve` Proxmox marker, and `bash`. Automatic token-file writing with `platform-proxmox-token-init --write-token-file` also needs `jq` on the Proxmox host.
 
-The Proxmox API token can be provided directly with `proxmox_api_token`, but local runs should prefer `proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"`. Keep that file outside Git with `0600` permissions.
+The Proxmox API token can be provided directly with `proxmox_api_token`, but local runs should prefer `proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"`. Provision the local config directory with `platform-config-init` and keep the token file outside Git with `0600` permissions.
 
 Example tfvars keep `proxmox_insecure = false` so TLS verification is enabled by default. If a private homelab still uses a self-signed or otherwise untrusted Proxmox certificate, prefer installing the Proxmox CA or using a valid certificate. Set `proxmox_insecure = true` only as an explicit private/local override after accepting the token exposure risk on that network path.
 

@@ -9,6 +9,13 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 No unreleased changes.
 
+## [1.2.2] - 2026-05-22
+
+### Changed
+
+- Documented `platform-config-init` from `platform-tools` as the normal way to create the local outside-Git `~/.config/platform-infrastructure/` directory, with manual directory creation kept as fallback guidance.
+- Moved the documented local Proxmox token path under the `infra/` namespace at `~/.config/platform-infrastructure/infra/proxmox.token`.
+
 ## [1.2.1] - 2026-05-21
 
 ### Fixed

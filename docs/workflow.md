@@ -42,7 +42,7 @@ Confirm these before running the first plan:
 - The target Proxmox node, bridge, and datastores are known.
 - A Proxmox API token exists or can be created. The initial apply identity is documented in `proxmox-api-token.md`.
 - The sibling private repo exists at `../platform-private` or will be created before private config is committed.
-- Optional `platform-tools` helpers are installed if you want to use `platform-proxmox-token-init` or `platform-ssh-init`.
+- Recommended `platform-tools` helpers are installed for normal local setup: `platform-config-init`, `platform-proxmox-token-init`, and `platform-ssh-init`.
 
 Install the repo-pinned OpenTofu binary:
 
@@ -58,7 +58,13 @@ make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"
 
 ## One-Time Local Private Setup
 
-Create the local token directory outside Git:
+Provision the local outside-Git config directory and placeholder secret files with `platform-tools`:
+
+```bash
+platform-config-init
+```
+
+If `platform-config-init` is unavailable, create the base directory manually as a fallback:
 
 ```bash
 mkdir -p ~/.config/platform-infrastructure
@@ -74,7 +80,7 @@ platform-proxmox-token-init \
   --token-id homelab \
   --role Administrator \
   --path / \
-  --write-token-file ~/.config/platform-infrastructure/proxmox-token \
+  --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token \
   --check
 ```
 
@@ -87,8 +93,10 @@ platform-proxmox-token-init \
   --token-id homelab \
   --role Administrator \
   --path / \
-  --write-token-file ~/.config/platform-infrastructure/proxmox-token
+  --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token
 ```
+
+The token helper creates the `infra/` parent directory when writing the token file.
 
 Use the Proxmox IP address until a trusted hostname or SSH alias exists. `root@pve` only works when `pve` resolves through DNS, `/etc/hosts`, or a `Host pve` block in `~/.ssh/config`.
 
@@ -119,7 +127,7 @@ make init-ssh ENV=dev PRIVATE=1
 The private tfvars files should reference the token file path, not the token value:
 
 ```hcl
-proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"
+proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"
 ```
 
 The scaffolded examples use `proxmox_insecure = false` so Proxmox API TLS verification is enabled by default. Prefer trusting the Proxmox API certificate from the operator workstation and CI runners. Use `proxmox_insecure = true` only as an explicit private/local override for a known self-signed setup after accepting the MITM and token exposure risk.

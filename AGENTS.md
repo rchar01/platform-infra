@@ -40,7 +40,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Keep Make as the stable public task interface; put multi-step shell logic under `scripts/` and call it from Make.
 - `make deps` installs OpenTofu into `~/.local/bin/tofu` by default. Override with `TOFU_INSTALL_DIR`, for example `TOFU_INSTALL_DIR="$PWD/.tools/bin"` in CI.
 - `make env` and `make init-ssh` use local ignored config only for fallback testing; pass `PRIVATE=1` for the normal private workflow in `../platform-private/infra`.
-- Proxmox tokens for local operator runs normally live in `~/.config/platform-infrastructure/proxmox-token` with `0600` permissions and are referenced by `proxmox_api_token_file`; do not store token values in `platform-private`.
+- Proxmox tokens for local operator runs normally live in `~/.config/platform-infrastructure/infra/proxmox.token` with `0600` permissions and are referenced by `proxmox_api_token_file`; do not store token values in `platform-private`.
 - Proxmox API user/token bootstrap belongs in `platform-tools` (`platform-proxmox-token-init`), not in this repo. This repo consumes an existing token.
 - Per-VM cloud-init SSH keys are generated under `~/.ssh` by `platform-ssh-init`; private Git stores only non-secret config and references.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
@@ -61,7 +61,7 @@ make validate
 - Run `tofu apply` or `tofu destroy` only when explicitly requested or clearly required for the task.
 - Commit `.terraform.lock.hcl` after successful `tofu init`; do not add it to `.gitignore`.
 - Do not commit real `terraform.tfvars`, state files, API tokens, or private SSH keys.
-- Prefer `proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"` for local Proxmox credentials so tokens are not exported into long-lived shells.
+- Prefer `proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"` for local Proxmox credentials so tokens are not exported into long-lived shells.
 - Secret-free CI can run `make verify` per environment with `TOFU_INSTALL_DIR="$PWD/.tools/bin"`.
 - CI plans that contact Proxmox must inject `TF_VAR_proxmox_api_token` from the CI secret store and use the matching private tfvars for the selected root; keep CI paths explicit per job instead of relying on local `.tofu.env` files.
 - Do not use CI apply with ephemeral local state; require remote state with locking first.

@@ -1,5 +1,5 @@
 proxmox_endpoint       = "https://192.0.2.10:8006/api2/json"
-proxmox_api_token_file = "~/.config/platform-infrastructure/proxmox-token"
+proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"
 proxmox_insecure       = false
 proxmox_node           = "pve"
 
