@@ -16,6 +16,7 @@ Then use the supporting docs as references.
 | Understand local state, lock files, and remote-state requirements | `state.md` |
 | Design CI validation, plan, and apply jobs | `ci.md` |
 | Choose VM names and VM IDs | `naming-conventions.md` |
+| Check public examples before publishing | `publication-checklist.md` |
 | Debug provisioning failures | `troubleshooting.md` |
 | Review intentionally deferred work | `roadmap.md` |
 

@@ -4,7 +4,12 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-No unreleased changes.
+Public example sanitization.
+
+Highlights:
+
+- Replaced environment-shaped public examples with neutral names and placeholder token identities.
+- Added a publication checklist for keeping future public examples free of real environment values.
 
 ## v1.2.2 - 2026-05-22
 

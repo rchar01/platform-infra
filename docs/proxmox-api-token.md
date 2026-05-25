@@ -4,14 +4,14 @@ Use a dedicated Proxmox API token for OpenTofu automation. Do not use root passw
 
 ## Apply Identity
 
-The initial homelab workflow expects a Proxmox API token for this automation identity:
+The initial homelab workflow expects a Proxmox API token for an automation identity. Use names that fit your private environment; public examples use placeholders:
 
-- User: `tofu@pve`
-- Token ID: `homelab`
-- Token format: `tofu@pve!homelab=TOKEN_SECRET`
-- Initial role: `Administrator` at `/`
+- User: `<automation-user>@<realm>`
+- Token ID: `<token-id>`
+- Token format: `<automation-user>@<realm>!<token-id>=TOKEN_SECRET`
+- Temporary bootstrap role example: `Administrator` at `/`
 
-The broad `Administrator` role is acceptable only for first private homelab validation. Replace it with a least-privilege role after basic provisioning works.
+The broad `Administrator` role is acceptable only as a temporary bootstrap shortcut for first private homelab validation. Replace it with a least-privilege role after basic provisioning works; do not keep it as the steady-state automation role.
 
 With `--privsep 0`, the token inherits the user's ACLs. If you later use a privilege-separated token, grant permissions to the token identity instead of relying on inherited user permissions.
 
@@ -30,8 +30,8 @@ Check the exact automatic token-file workflow first:
 ```bash
 platform-proxmox-token-init \
   --ssh root@<proxmox-ip> \
-  --proxmox-user tofu@pve \
-  --token-id homelab \
+  --proxmox-user <automation-user>@<realm> \
+  --token-id <token-id> \
   --role Administrator \
   --path / \
   --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token \
@@ -43,8 +43,8 @@ Then run the same command without `--check` to create the identity and write a n
 ```bash
 platform-proxmox-token-init \
   --ssh root@<proxmox-ip> \
-  --proxmox-user tofu@pve \
-  --token-id homelab \
+  --proxmox-user <automation-user>@<realm> \
+  --token-id <token-id> \
   --role Administrator \
   --path / \
   --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token
@@ -60,7 +60,7 @@ Automatic token-file writing requires `jq` on the Proxmox host. Without `jq`, om
 
 If `~/.config/platform-infrastructure/infra/proxmox.token` is already non-empty, the automatic workflow refuses to overwrite it. Use `--force` only when intentionally replacing the local token file.
 
-Proxmox only shows the token secret when the token is created. If `tofu@pve!homelab` already exists, the helper cannot recover the existing secret; delete and recreate the token if the secret was lost.
+Proxmox only shows the token secret when the token is created. If the token already exists, the helper cannot recover the existing secret; delete and recreate the token if the secret was lost.
 
 See `platform-tools/docs/platform-config-init.md` and `platform-tools/docs/proxmox-token-init.md` in the `platform-tools` repository for helper details and options.
 
@@ -71,9 +71,9 @@ The manual `pveum` commands are the source-of-truth behavior:
 Example Proxmox setup:
 
 ```bash
-pveum user add tofu@pve --comment "OpenTofu automation user"
-pveum user token add tofu@pve homelab --privsep 0
-pveum aclmod / -user tofu@pve -role Administrator
+pveum user add <automation-user>@<realm> --comment "OpenTofu automation user"
+pveum user token add <automation-user>@<realm> <token-id> --privsep 0
+pveum aclmod / -user <automation-user>@<realm> -role Administrator
 ```
 
 Store the real token outside every Git repository or in a local secret manager. Never commit the real token.
@@ -90,7 +90,7 @@ chmod 600 ~/.config/platform-infrastructure/infra/proxmox.token
 The file should contain only the token value:
 
 ```text
-tofu@pve!homelab=TOKEN_SECRET
+<automation-user>@<realm>!<token-id>=TOKEN_SECRET
 ```
 
 Reference that file from local or private tfvars:

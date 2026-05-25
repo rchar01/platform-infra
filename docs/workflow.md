@@ -76,8 +76,8 @@ Bootstrap the Proxmox API identity from the operator workstation over SSH. Check
 ```bash
 platform-proxmox-token-init \
   --ssh root@<proxmox-ip> \
-  --proxmox-user tofu@pve \
-  --token-id homelab \
+  --proxmox-user <automation-user>@<realm> \
+  --token-id <token-id> \
   --role Administrator \
   --path / \
   --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token \
@@ -89,8 +89,8 @@ Then run the same command without `--check`:
 ```bash
 platform-proxmox-token-init \
   --ssh root@<proxmox-ip> \
-  --proxmox-user tofu@pve \
-  --token-id homelab \
+  --proxmox-user <automation-user>@<realm> \
+  --token-id <token-id> \
   --role Administrator \
   --path / \
   --write-token-file ~/.config/platform-infrastructure/infra/proxmox.token
@@ -103,7 +103,7 @@ Use the Proxmox IP address until a trusted hostname or SSH alias exists. `root@p
 The token file should contain only the Proxmox token value:
 
 ```text
-tofu@pve!homelab=TOKEN_SECRET
+<automation-user>@<realm>!<token-id>=TOKEN_SECRET
 ```
 
 If the local token file is already non-empty, the automatic workflow refuses to overwrite it. Use `--force` only when intentionally replacing the token file. If the token already exists in Proxmox, Proxmox cannot show the existing secret; delete and recreate the token if the secret was lost.

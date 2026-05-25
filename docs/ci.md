@@ -48,7 +48,7 @@ cd environments/dev
 The CI platform should inject this environment variable from its secret store:
 
 ```bash
-TF_VAR_proxmox_api_token='tofu@pve!homelab=TOKEN_SECRET'
+TF_VAR_proxmox_api_token='<automation-user>@<realm>!<token-id>=TOKEN_SECRET'
 ```
 
 Do not print the token, write it to a committed file, or store it in `platform-private`.

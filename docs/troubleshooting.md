@@ -70,12 +70,12 @@ Check `proxmox_endpoint` in the selected tfvars file and the token file referenc
 The expected token shape is:
 
 ```text
-tofu@pve!homelab=TOKEN_SECRET
+<automation-user>@<realm>!<token-id>=TOKEN_SECRET
 ```
 
-Confirm the token has permission to clone and manage VMs. The first homelab setup may use `Administrator`; reduce privileges later after the workflow works.
+Confirm the token has permission to clone and manage VMs. A first homelab setup may temporarily use `Administrator`; reduce privileges after the workflow works and do not keep that as the steady-state automation role.
 
-The documented default identity is `tofu@pve!homelab`. If `platform-tools` is available on your operator workstation, check the Proxmox bootstrap prerequisites over SSH:
+If `platform-tools` is available on your operator workstation, check the Proxmox bootstrap prerequisites over SSH:
 
 ```bash
 platform-proxmox-token-init --ssh root@<proxmox-ip> --check
@@ -92,7 +92,7 @@ platform-proxmox-token-init \
 
 Without `--write-token-file`, check mode validates the manual token output workflow and treats remote `jq` as optional. With `--write-token-file`, check mode validates the automatic token-file workflow and requires remote `jq`. A non-empty local token file fails the automatic workflow unless `--force` is used intentionally.
 
-If you intentionally use a different realm, the token line must match it. For example, a PAM user named `tofu` requires `tofu@pam!homelab=TOKEN_SECRET`, not `tofu@pve!homelab=TOKEN_SECRET`.
+If you intentionally use a different realm, the token line must match it. For example, a PAM user requires `<automation-user>@pam!<token-id>=TOKEN_SECRET`, not `<automation-user>@pve!<token-id>=TOKEN_SECRET`.
 
 Confirm the token file exists, contains only the token value, and is readable only by your user:
 

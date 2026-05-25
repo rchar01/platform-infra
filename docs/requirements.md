@@ -37,7 +37,7 @@ Required Proxmox resources:
 - Existing VM template ID.
 - API token for OpenTofu automation.
 - A Proxmox API certificate trusted by the operator workstation and CI runners, or an explicit private decision to use `proxmox_insecure = true` only for local fallback testing.
-- Apply-capable Proxmox identity, initially `tofu@pve!homelab` with `Administrator` at `/` for first homelab validation.
+- Apply-capable Proxmox identity, with a temporary bootstrap role or least-privilege role that can clone and manage the intended VMs.
 - Target node name.
 - Network bridge, usually `vmbr0`.
 - Datastore for cloned VM disks.
@@ -51,7 +51,7 @@ Example tfvars keep `proxmox_insecure = false` so TLS verification is enabled by
 
 Private repository configs should not contain the token value. They may contain normal private configuration such as `homelab.tfvars`, `dev.tfvars`, `homelab.tofu.env`, and `dev.tofu.env`.
 
-See `proxmox-api-token.md` for the exact Proxmox user, token, and ACL setup expected by the first apply.
+See `proxmox-api-token.md` for Proxmox user, token, and ACL setup guidance for the first apply.
 
 ## OpenTofu Roots
 

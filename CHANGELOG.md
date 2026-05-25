@@ -7,7 +7,10 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-No unreleased changes.
+### Changed
+
+- Sanitized public examples to use neutral hostnames, DNS search domains, VM IDs, template IDs, and placeholder Proxmox token identities.
+- Added a public repository publication checklist for future documentation and example updates.
 
 ## [1.2.2] - 2026-05-22
 
