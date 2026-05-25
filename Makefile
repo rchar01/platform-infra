@@ -12,7 +12,7 @@ TFVARS_ABS := $(abspath $(TFVARS))
 CONFIG_ROOT_ABS := $(abspath $(CONFIG_ROOT))
 
 PLATFORM_SSH_INIT ?= platform-ssh-init
-SSH_KEY_DIR ?= ~/.ssh
+SSH_KEY_DIR ?= $${HOME}/.ssh
 SSH_KEY_PREFIX ?= platform-infra
 TOFU_VERSION ?= 1.11.7
 TOFU_INSTALL_DIR ?= $(HOME)/.local/bin
@@ -40,7 +40,7 @@ help:
 	@printf '  %-24s %s\n' 'PRIVATE' 'Use ../platform-private/infra config when set, default: empty'
 	@printf '  %-24s %s\n' 'CONFIG_ROOT' 'Config root, default: environments/$(ENV) or ../platform-private/infra'
 	@printf '  %-24s %s\n' 'TFVARS' 'OpenTofu var file, default follows CONFIG_ROOT'
-	@printf '  %-24s %s\n' 'SSH_KEY_DIR' 'Directory for generated per-VM SSH keys, default: ~/.ssh'
+	@printf '  %-24s %s\n' 'SSH_KEY_DIR' 'Directory for generated per-VM SSH keys, default: $$HOME/.ssh'
 	@printf '  %-24s %s\n' 'SSH_KEY_PREFIX' 'Prefix for generated per-VM SSH keys, default: platform-infra'
 	@printf '  %-24s %s\n' 'TOFU_VERSION' 'OpenTofu version, default: 1.11.7'
 	@printf '  %-24s %s\n' 'TOFU_INSTALL_DIR' 'Directory for tofu, default: $(HOME)/.local/bin'

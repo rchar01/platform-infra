@@ -7,7 +7,13 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-No unreleased changes.
+### Added
+
+- Added a sanitized dev load balancer VM example for external Kubernetes workload ingress patterns.
+
+### Fixed
+
+- Fixed the `make init-ssh` default SSH key directory so quoted shell execution resolves to `$HOME/.ssh` instead of a literal `~/.ssh` path.
 
 ## [1.3.0] - 2026-05-25
 

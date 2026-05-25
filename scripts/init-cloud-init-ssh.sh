@@ -6,7 +6,7 @@ empty_passphrase="${SSH_EMPTY_PASSPHRASE:-}"
 env_name="${ENV:-homelab}"
 env_dir="${ENV_DIR:-environments/${env_name}}"
 tfvars="${TFVARS:-}"
-ssh_key_dir="${SSH_KEY_DIR:-~/.ssh}"
+ssh_key_dir="${SSH_KEY_DIR:-${HOME}/.ssh}"
 ssh_key_prefix="${SSH_KEY_PREFIX:-platform-infra}"
 
 case "${ssh_key_dir}" in

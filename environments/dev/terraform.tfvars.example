@@ -37,4 +37,22 @@ vms = {
     ipv4         = "192.0.2.60/24"
     ipv4_gateway = "192.0.2.1"
   }
+
+  example-lb-01 = {
+    vm_id       = 103
+    hostname    = "example-lb-01.example.test"
+    description = "Example external Kubernetes workload load balancer VM"
+    tags        = ["rocky", "dev", "lb", "haproxy"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 2048
+    memory_floating_mb = 1434
+    disk_gb            = 20
+
+    additional_disks = []
+
+    ipv4         = "192.0.2.73/24"
+    ipv4_gateway = "192.0.2.1"
+  }
 }

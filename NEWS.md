@@ -4,7 +4,12 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-No unreleased changes.
+Public dev load balancer example and SSH key path fix.
+
+Highlights:
+
+- Added a sanitized dev load balancer VM example for external Kubernetes workload ingress patterns.
+- Fixed `make init-ssh` so the default SSH key directory resolves to `$HOME/.ssh` under quoted shell execution.
 
 ## v1.3.0 - 2026-05-25
 
