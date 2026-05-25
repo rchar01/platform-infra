@@ -4,6 +4,10 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
+No unreleased changes.
+
+## v1.3.0 - 2026-05-25
+
 Public example sanitization.
 
 Highlights:
