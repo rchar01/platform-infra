@@ -4,7 +4,11 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-No unreleased changes.
+README workflow clarification.
+
+Highlights:
+
+- Clarified when to use root Make helpers and when to run native `tofu` from an environment root.
 
 ## v1.3.1 - 2026-05-26
 

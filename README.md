@@ -43,6 +43,8 @@ make deps
 make help
 ```
 
+Use Make targets from the repository root for setup, formatting, validation, and SSH key helpers. Use native `tofu` commands from the selected `environments/<env>` root for `plan`, `apply`, `destroy`, and output inspection after sourcing the matching private `.tofu.env` file.
+
 ## Platform Project
 
 This repository is one part of a multi-repository homelab platform project.

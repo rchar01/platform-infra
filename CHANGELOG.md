@@ -7,7 +7,9 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-No unreleased changes.
+### Changed
+
+- Clarified in the README when to use repository-root Make helper targets versus native `tofu` commands from environment roots.
 
 ## [1.3.1] - 2026-05-26
 
