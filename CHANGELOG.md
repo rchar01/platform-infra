@@ -7,9 +7,14 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [1.3.1] - 2026-05-26
+
 ### Added
 
-- Added a sanitized dev load balancer VM example for external Kubernetes workload ingress patterns.
+- Expanded dev VM examples to cover bastion, registry, registry runner, vault, monitoring, Kubernetes node, Kubernetes runner, and external load balancer patterns.
+- Added a homelab GitLab VM example with homelab-specific tags.
 
 ### Fixed
 
@@ -19,7 +24,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Sanitized public examples to use neutral hostnames, DNS search domains, VM IDs, template IDs, and placeholder Proxmox token identities.
+- Public examples use neutral hostnames, DNS search domains, VM IDs, template IDs, and placeholder Proxmox token identities.
 - Added a public repository publication checklist for future documentation and example updates.
 
 ## [1.2.2] - 2026-05-22

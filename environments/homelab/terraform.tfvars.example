@@ -15,26 +15,26 @@ cloud_init_username = "rocky"
 agent_enabled       = true
 
 vms = {
-  example-bastion-01 = {
+  example-homelab-gitlab-01 = {
     vm_id       = 101
-    hostname    = "example-bastion-01.example.test"
-    description = "Example bastion VM"
-    tags        = ["rocky", "bastion", "dev"]
+    hostname    = "example-homelab-gitlab-01.example.test"
+    description = "Example homelab GitLab VM"
+    tags        = ["rocky", "homelab", "gitlab", "scm"]
 
-    cores     = 2
-    cpu_type  = "host"
-    memory_mb = 4096
-    memory_floating_mb = 2867
-    disk_gb   = 25
+    cores              = 4
+    cpu_type           = "host"
+    memory_mb          = 8192
+    memory_floating_mb = 5734
+    disk_gb            = 25
 
     additional_disks = [
       {
         interface = "scsi1"
-        size_gb   = 15
+        size_gb   = 100
       }
     ]
 
-    ipv4         = "192.0.2.50/24"
+    ipv4         = "192.0.2.51/24"
     ipv4_gateway = "192.0.2.1"
   }
 }

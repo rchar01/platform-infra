@@ -15,17 +15,17 @@ cloud_init_username = "rocky"
 agent_enabled       = true
 
 vms = {
-  example-bastion-01 = {
+  example-dev-bastion-01 = {
     vm_id       = 102
-    hostname    = "example-bastion-01.example.test"
-    description = "Example bastion VM"
+    hostname    = "example-dev-bastion-01.example.test"
+    description = "Example dev bastion VM"
     tags        = ["rocky", "bastion", "dev"]
 
-    cores     = 2
-    cpu_type  = "host"
-    memory_mb = 4096
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 4096
     memory_floating_mb = 2867
-    disk_gb   = 25
+    disk_gb            = 25
 
     additional_disks = [
       {
@@ -38,9 +38,170 @@ vms = {
     ipv4_gateway = "192.0.2.1"
   }
 
-  example-lb-01 = {
+  example-dev-registry-01 = {
     vm_id       = 103
-    hostname    = "example-lb-01.example.test"
+    hostname    = "example-dev-registry-01.example.test"
+    description = "Example dev registry VM"
+    tags        = ["rocky", "dev", "registry"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 4096
+    memory_floating_mb = 2867
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.61/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-registry-runner-01 = {
+    vm_id       = 104
+    hostname    = "example-dev-registry-runner-01.example.test"
+    description = "Example dev registry runner VM"
+    tags        = ["rocky", "dev", "registry", "runner"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 4096
+    memory_floating_mb = 2867
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.62/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-vault-01 = {
+    vm_id       = 105
+    hostname    = "example-dev-vault-01.example.test"
+    description = "Example dev vault VM"
+    tags        = ["rocky", "dev", "vault"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 4096
+    memory_floating_mb = 2867
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.63/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-k8s-monitoring-01 = {
+    vm_id       = 106
+    hostname    = "example-dev-k8s-monitoring-01.example.test"
+    description = "Example dev Kubernetes monitoring VM"
+    tags        = ["rocky", "dev", "k8s", "monitoring"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 6144
+    memory_floating_mb = 4301
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.64/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-k8s-runner-01 = {
+    vm_id       = 107
+    hostname    = "example-dev-k8s-runner-01.example.test"
+    description = "Example dev Kubernetes runner VM"
+    tags        = ["rocky", "dev", "k8s", "runner"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 4096
+    memory_floating_mb = 2867
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.65/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-k8s-node-01 = {
+    vm_id       = 108
+    hostname    = "example-dev-k8s-node-01.example.test"
+    description = "Example dev Kubernetes control-plane VM"
+    tags        = ["rocky", "dev", "k8s", "control-plane"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 6144
+    memory_floating_mb = 4301
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.66/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-k8s-node-02 = {
+    vm_id       = 109
+    hostname    = "example-dev-k8s-node-02.example.test"
+    description = "Example dev Kubernetes worker VM"
+    tags        = ["rocky", "dev", "k8s", "worker"]
+
+    cores              = 2
+    cpu_type           = "host"
+    memory_mb          = 6144
+    memory_floating_mb = 4301
+    disk_gb            = 25
+
+    additional_disks = [
+      {
+        interface = "scsi1"
+        size_gb   = 25
+      }
+    ]
+
+    ipv4         = "192.0.2.67/24"
+    ipv4_gateway = "192.0.2.1"
+  }
+
+  example-dev-lb-01 = {
+    vm_id       = 110
+    hostname    = "example-dev-lb-01.example.test"
     description = "Example external Kubernetes workload load balancer VM"
     tags        = ["rocky", "dev", "lb", "haproxy"]
 

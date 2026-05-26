@@ -4,11 +4,16 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-Public dev load balancer example and SSH key path fix.
+No unreleased changes.
+
+## v1.3.1 - 2026-05-26
+
+Public representative VM examples and SSH key path fix.
 
 Highlights:
 
-- Added a sanitized dev load balancer VM example for external Kubernetes workload ingress patterns.
+- Expanded dev examples to cover the representative platform component classes.
+- Added a homelab GitLab example with homelab-specific tags.
 - Fixed `make init-ssh` so the default SSH key directory resolves to `$HOME/.ssh` under quoted shell execution.
 
 ## v1.3.0 - 2026-05-25
