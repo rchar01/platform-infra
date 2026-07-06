@@ -1,8 +1,10 @@
-# platform-infra
-
 <div align="center">
   <img src="assets/brand/platform-infra-forge-avatar-transparent-512.png" width="256" alt="platform-infra logo">
+  <h1>platform-infra</h1>
+  <p>Proxmox VM lifecycle infrastructure managed with OpenTofu.</p>
 </div>
+
+---
 
 `platform-infra` provisions Proxmox VMs with OpenTofu. It owns whether a VM exists and what virtual hardware, network attachment, initial cloud-init access, and handoff outputs it has.
 
@@ -118,6 +120,22 @@ Out of scope:
 - Ansible roles or playbooks.
 
 Cloud-init is intentionally minimal here. This repo may set hostname, initial user, SSH key, IP addressing, and DNS intent. Do not use cloud-init in this repo for complex OS configuration.
+
+## Proxmox Disk Performance
+
+For Linux VMs on Proxmox, especially with ZFS-backed storage, the practical target shape is:
+
+- Host storage backed by a ZFS pool when that is the selected Proxmox storage design.
+- VM disks on zvol or raw block storage rather than qcow2 files on ZFS.
+- SCSI disk interfaces such as `scsi0` and `scsi1` with the `virtio-scsi-single` controller.
+- IO thread enabled for VM disks.
+- Discard/TRIM enabled so space reclamation can pass through to the underlying storage.
+- Disk cache set to `none` by default; use `writeback` only when the durability and power-loss tradeoffs are deliberate.
+- Guest filesystems such as XFS or ext4 for typical Linux workloads.
+
+Repository boundary still applies. `platform-infra` may own virtual disk shape, datastore selection, controller, cache, IO thread, and discard settings. `platform-template-builder` owns template image preparation. `platform-config` owns guest partitioning, formatting, filesystems, LVM, mounts, and `fstab`.
+
+Current examples use SCSI disk interfaces and block-style Proxmox datastores, but this module does not yet force `virtio-scsi-single`, disk IO threads, discard/TRIM, or raw file format defaults. Treat those as the preferred direction for future Terraform module changes, and inspect `tofu plan` carefully because changing disk/controller attributes on existing VMs can require shutdowns or affect cloned disk settings.
 
 ## Private Workflow
 

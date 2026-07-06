@@ -7,8 +7,13 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Documented Proxmox disk-performance guidance for Linux VMs, including the boundary between infra-owned virtual disk settings and guest-owned filesystem configuration.
+
 ### Changed
 
+- Reworked the README header with a centered 256px project logo and separator.
 - Clarified in the README when to use repository-root Make helper targets versus native `tofu` commands from environment roots.
 
 ## [1.3.1] - 2026-05-26

@@ -4,10 +4,12 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-README workflow clarification.
+README workflow and Proxmox disk-performance guidance.
 
 Highlights:
 
+- Added practical Proxmox disk-performance guidance for Linux VMs and documented which parts belong to infra versus guest configuration.
+- Updated the README header with a centered 256px project logo and separator.
 - Clarified when to use root Make helpers and when to run native `tofu` from an environment root.
 
 ## v1.3.1 - 2026-05-26
