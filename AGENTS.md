@@ -75,6 +75,8 @@ make validate
 - `cloud_init_username` defaults to `rocky` for Rocky cloud templates.
 - `agent_enabled` defaults to `true`, but the template must actually install and start `qemu-guest-agent`; that responsibility is outside this repo.
 - `memory_mb` is the Proxmox maximum memory value; optional per-VM `memory_floating_mb` sets the Proxmox ballooned minimum memory value.
+- VM disk defaults use `virtio-scsi-single`, disk IO threads, discard `on`, cache `none`, and file format `raw`; keep root, VM, and additional-disk overrides available when changing this behavior.
+- QEMU guest agent fstrim integration defaults to disabled with `default_agent_trim = false`; enable it only when the template reliably runs `qemu-guest-agent` and guest filesystem trim behavior is intentional.
 - DHCP is the default network mode. Actual leased IP outputs require a working guest agent.
 - Additional virtual disks are infra-owned only until the device exists; guest storage configuration belongs in `platform-config`.
 - `ansible_inventory_map` is only a structured handoff for future `platform-config`; do not generate Ansible roles or playbooks here.

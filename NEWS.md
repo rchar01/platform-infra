@@ -8,6 +8,8 @@ README workflow and Proxmox disk-performance guidance.
 
 Highlights:
 
+- Added explicit Proxmox disk performance defaults for VirtIO SCSI single, disk IO threads, discard/TRIM, cache mode, and raw disk format.
+- Kept QEMU guest agent fstrim disabled by default and documented when to enable it deliberately.
 - Reworded documentation and agent guidance so the included environment roots are clearly examples, not product limitations.
 - Added practical Proxmox disk-performance guidance for Linux VMs and documented which parts belong to infra versus guest configuration.
 - Updated the README header with a centered 256px project logo and separator.

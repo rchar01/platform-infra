@@ -9,10 +9,12 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added explicit Proxmox disk performance defaults for VirtIO SCSI single, disk IO threads, discard/TRIM, cache mode, and raw disk format, with root, VM, and additional-disk override support.
 - Documented Proxmox disk-performance guidance for Linux VMs, including the boundary between infra-owned virtual disk settings and guest-owned filesystem configuration.
 
 ### Changed
 
+- Kept QEMU guest agent fstrim integration disabled by default and documented when to enable it deliberately.
 - Reworded public documentation and agent guidance so the included environment roots are presented as examples rather than product capability limits.
 - Reworked the README header with a centered 256px project logo and separator.
 - Clarified in the README when to use repository-root Make helper targets versus native `tofu` commands from environment roots.

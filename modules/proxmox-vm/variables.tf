@@ -63,8 +63,33 @@ variable "additional_disks" {
     interface    = string
     size_gb      = number
     datastore_id = optional(string)
+    cache        = optional(string)
+    discard      = optional(string)
+    file_format  = optional(string)
+    iothread     = optional(bool)
   }))
   default = []
+
+  validation {
+    condition = alltrue([
+      for disk in var.additional_disks : contains(["none", "directsync", "writethrough", "writeback", "unsafe"], coalesce(disk.cache, "none"))
+    ])
+    error_message = "Each additional disk cache value must be one of none, directsync, writethrough, writeback, or unsafe."
+  }
+
+  validation {
+    condition = alltrue([
+      for disk in var.additional_disks : contains(["on", "ignore"], coalesce(disk.discard, "on"))
+    ])
+    error_message = "Each additional disk discard value must be one of on or ignore."
+  }
+
+  validation {
+    condition = alltrue([
+      for disk in var.additional_disks : contains(["raw", "qcow2", "vmdk"], coalesce(disk.file_format, "raw"))
+    ])
+    error_message = "Each additional disk file_format value must be one of raw, qcow2, or vmdk."
+  }
 }
 
 variable "datastore_id" {
@@ -81,6 +106,56 @@ variable "boot_disk_interface" {
   description = "Boot disk interface inherited from the template."
   type        = string
   default     = "scsi0"
+}
+
+variable "scsi_hardware" {
+  description = "Proxmox SCSI controller hardware type."
+  type        = string
+  default     = "virtio-scsi-single"
+
+  validation {
+    condition     = contains(["lsi", "lsi53c810", "virtio-scsi-pci", "virtio-scsi-single", "megasas", "pvscsi"], var.scsi_hardware)
+    error_message = "scsi_hardware must be one of lsi, lsi53c810, virtio-scsi-pci, virtio-scsi-single, megasas, or pvscsi."
+  }
+}
+
+variable "disk_iothread" {
+  description = "Enable IO thread for VM disks by default."
+  type        = bool
+  default     = true
+}
+
+variable "disk_discard" {
+  description = "Default discard/TRIM behavior for VM disks."
+  type        = string
+  default     = "on"
+
+  validation {
+    condition     = contains(["on", "ignore"], var.disk_discard)
+    error_message = "disk_discard must be one of on or ignore."
+  }
+}
+
+variable "disk_cache" {
+  description = "Default Proxmox cache mode for VM disks."
+  type        = string
+  default     = "none"
+
+  validation {
+    condition     = contains(["none", "directsync", "writethrough", "writeback", "unsafe"], var.disk_cache)
+    error_message = "disk_cache must be one of none, directsync, writethrough, writeback, or unsafe."
+  }
+}
+
+variable "disk_file_format" {
+  description = "Default disk file format for VM disks."
+  type        = string
+  default     = "raw"
+
+  validation {
+    condition     = contains(["raw", "qcow2", "vmdk"], var.disk_file_format)
+    error_message = "disk_file_format must be one of raw, qcow2, or vmdk."
+  }
 }
 
 variable "bridge" {
@@ -137,4 +212,10 @@ variable "agent_enabled" {
   description = "Enable Proxmox QEMU guest agent integration for this VM."
   type        = bool
   default     = true
+}
+
+variable "agent_trim" {
+  description = "Enable QEMU guest agent fstrim integration. Requires a working guest agent and guest support."
+  type        = bool
+  default     = false
 }

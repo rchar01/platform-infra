@@ -135,7 +135,9 @@ For Linux VMs on Proxmox, especially with ZFS-backed storage, the practical targ
 
 Repository boundary still applies. `platform-infra` may own virtual disk shape, datastore selection, controller, cache, IO thread, and discard settings. `platform-template-builder` owns template image preparation. `platform-config` owns guest partitioning, formatting, filesystems, LVM, mounts, and `fstab`.
 
-Current examples use SCSI disk interfaces and block-style Proxmox datastores, but this module does not yet force `virtio-scsi-single`, disk IO threads, discard/TRIM, or raw file format defaults. Treat those as the preferred direction for future Terraform module changes, and inspect `tofu plan` carefully because changing disk/controller attributes on existing VMs can require shutdowns or affect cloned disk settings.
+The module now defaults to `scsi_hardware = "virtio-scsi-single"`, disk `iothread = true`, `discard = "on"`, `cache = "none"`, and `file_format = "raw"`. Environment roots expose defaults and per-VM overrides for those settings; additional disks can override cache, discard, file format, and IO thread per disk.
+
+QEMU guest agent filesystem trim integration stays disabled by default with `default_agent_trim = false`. Enable it only when the template reliably installs and starts `qemu-guest-agent`, the guest filesystem stack supports fstrim safely, and the operator wants Proxmox-triggered guest fstrim in addition to disk-level discard. Inspect `tofu plan` carefully before applying these settings to existing VMs because disk/controller changes can require shutdowns or affect cloned disk attributes.
 
 ## Private Workflow
 

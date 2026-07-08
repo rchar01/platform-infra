@@ -51,6 +51,56 @@ variable "default_cloud_init_datastore" {
   default     = "local-lvm"
 }
 
+variable "default_scsi_hardware" {
+  description = "Default Proxmox SCSI controller hardware type."
+  type        = string
+  default     = "virtio-scsi-single"
+
+  validation {
+    condition     = contains(["lsi", "lsi53c810", "virtio-scsi-pci", "virtio-scsi-single", "megasas", "pvscsi"], var.default_scsi_hardware)
+    error_message = "default_scsi_hardware must be one of lsi, lsi53c810, virtio-scsi-pci, virtio-scsi-single, megasas, or pvscsi."
+  }
+}
+
+variable "default_disk_iothread" {
+  description = "Default setting for VM disk IO threads."
+  type        = bool
+  default     = true
+}
+
+variable "default_disk_discard" {
+  description = "Default discard/TRIM behavior for VM disks."
+  type        = string
+  default     = "on"
+
+  validation {
+    condition     = contains(["on", "ignore"], var.default_disk_discard)
+    error_message = "default_disk_discard must be one of on or ignore."
+  }
+}
+
+variable "default_disk_cache" {
+  description = "Default Proxmox cache mode for VM disks."
+  type        = string
+  default     = "none"
+
+  validation {
+    condition     = contains(["none", "directsync", "writethrough", "writeback", "unsafe"], var.default_disk_cache)
+    error_message = "default_disk_cache must be one of none, directsync, writethrough, writeback, or unsafe."
+  }
+}
+
+variable "default_disk_file_format" {
+  description = "Default disk file format for VM disks."
+  type        = string
+  default     = "raw"
+
+  validation {
+    condition     = contains(["raw", "qcow2", "vmdk"], var.default_disk_file_format)
+    error_message = "default_disk_file_format must be one of raw, qcow2, or vmdk."
+  }
+}
+
 variable "default_dns_servers" {
   description = "Default DNS servers advertised through cloud-init."
   type        = list(string)
@@ -92,6 +142,12 @@ variable "agent_enabled" {
   default     = true
 }
 
+variable "default_agent_trim" {
+  description = "Default setting for QEMU guest agent fstrim integration. Requires a working guest agent and guest support."
+  type        = bool
+  default     = false
+}
+
 variable "vms" {
   description = "VMs to clone from existing Proxmox templates."
   type = map(object({
@@ -111,11 +167,20 @@ variable "vms" {
       interface    = string
       size_gb      = number
       datastore_id = optional(string)
+      cache        = optional(string)
+      discard      = optional(string)
+      file_format  = optional(string)
+      iothread     = optional(bool)
     })), [])
 
     datastore_id            = optional(string)
     cloud_init_datastore_id = optional(string)
     boot_disk_interface     = optional(string)
+    scsi_hardware           = optional(string)
+    disk_iothread           = optional(bool)
+    disk_discard            = optional(string)
+    disk_cache              = optional(string)
+    disk_file_format        = optional(string)
     bridge                  = optional(string)
     ipv4                    = optional(string, "dhcp")
     ipv4_gateway            = optional(string)
@@ -126,6 +191,7 @@ variable "vms" {
     ssh_public_key_file     = optional(string)
     cloud_init_username     = optional(string)
     agent_enabled           = optional(bool)
+    agent_trim              = optional(bool)
     cpu_type                = optional(string)
   }))
   default = {}

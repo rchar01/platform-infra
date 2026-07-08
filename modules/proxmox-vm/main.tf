@@ -15,9 +15,11 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   agent {
     enabled = var.agent_enabled
+    trim    = var.agent_trim
   }
 
   stop_on_destroy = true
+  scsi_hardware   = var.scsi_hardware
 
   cpu {
     cores = var.cores
@@ -31,7 +33,11 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   disk {
     datastore_id = var.datastore_id
+    cache        = var.disk_cache
+    discard      = var.disk_discard
+    file_format  = var.disk_file_format
     interface    = var.boot_disk_interface
+    iothread     = var.disk_iothread
     size         = var.disk_gb
   }
 
@@ -40,7 +46,11 @@ resource "proxmox_virtual_environment_vm" "this" {
 
     content {
       datastore_id = coalesce(disk.value.datastore_id, var.datastore_id)
+      cache        = coalesce(disk.value.cache, var.disk_cache)
+      discard      = coalesce(disk.value.discard, var.disk_discard)
+      file_format  = coalesce(disk.value.file_format, var.disk_file_format)
       interface    = disk.value.interface
+      iothread     = coalesce(disk.value.iothread, var.disk_iothread)
       size         = disk.value.size_gb
     }
   }
@@ -77,5 +87,12 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   operating_system {
     type = "l26"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = !var.agent_trim || var.agent_enabled
+      error_message = "agent_trim requires agent_enabled to be true."
+    }
   }
 }
