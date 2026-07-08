@@ -47,7 +47,7 @@ Proxmox API token bootstrap additionally needs SSH access to the Proxmox host as
 
 The Proxmox API token can be provided directly with `proxmox_api_token`, but local runs should prefer `proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"`. Provision the local config directory with `platform-config-init` and keep the token file outside Git with `0600` permissions.
 
-Example tfvars keep `proxmox_insecure = false` so TLS verification is enabled by default. If a private homelab still uses a self-signed or otherwise untrusted Proxmox certificate, prefer installing the Proxmox CA or using a valid certificate. Set `proxmox_insecure = true` only as an explicit private/local override after accepting the token exposure risk on that network path.
+Example tfvars keep `proxmox_insecure = false` so TLS verification is enabled by default. If a private environment still uses a self-signed or otherwise untrusted Proxmox certificate, prefer installing the Proxmox CA or using a valid certificate. Set `proxmox_insecure = true` only as an explicit private/local override after accepting the token exposure risk on that network path.
 
 Private repository configs should not contain the token value. They may contain normal private configuration such as `homelab.tfvars`, `dev.tfvars`, `homelab.tofu.env`, and `dev.tofu.env`.
 

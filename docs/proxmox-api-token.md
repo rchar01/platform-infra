@@ -4,14 +4,14 @@ Use a dedicated Proxmox API token for OpenTofu automation. Do not use root passw
 
 ## Apply Identity
 
-The initial homelab workflow expects a Proxmox API token for an automation identity. Use names that fit your private environment; public examples use placeholders:
+The initial private environment workflow expects a Proxmox API token for an automation identity. Use names that fit your private environment; public examples use placeholders:
 
 - User: `<automation-user>@<realm>`
 - Token ID: `<token-id>`
 - Token format: `<automation-user>@<realm>!<token-id>=TOKEN_SECRET`
 - Temporary bootstrap role example: `Administrator` at `/`
 
-The broad `Administrator` role is acceptable only as a temporary bootstrap shortcut for first private homelab validation. Replace it with a least-privilege role after basic provisioning works; do not keep it as the steady-state automation role.
+The broad `Administrator` role is acceptable only as a temporary bootstrap shortcut for first private environment validation. Replace it with a least-privilege role after basic provisioning works; do not keep it as the steady-state automation role.
 
 With `--privsep 0`, the token inherits the user's ACLs. If you later use a privilege-separated token, grant permissions to the token identity instead of relying on inherited user permissions.
 
@@ -116,7 +116,7 @@ In CI, configure the same value as a masked secret named `TF_VAR_proxmox_api_tok
 `proxmox_api_token_file` may also point at an environment-specific token file if separate Proxmox tokens are used per environment:
 
 ```hcl
-proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox-homelab-token"
+proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox-prod-token"
 ```
 
 Relative token file paths are resolved from `config_root`, which should match the config directory used by the native OpenTofu command. In the local private workflow, the sourced `*.tofu.env` file sets `config_root` for plan, apply, and destroy.

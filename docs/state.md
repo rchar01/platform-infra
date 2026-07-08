@@ -33,7 +33,7 @@ Do not create or rely on a local ignored `terraform.tfvars` for the normal priva
 
 ## Local State
 
-Local state is suitable for the initial single-operator homelab workflow.
+Local state is suitable for the initial single-operator local workflow.
 
 Do not manually edit state files as part of normal operation. Use OpenTofu state commands only when intentionally moving, importing, or removing a resource mapping.
 

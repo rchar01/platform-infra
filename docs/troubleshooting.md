@@ -73,7 +73,7 @@ The expected token shape is:
 <automation-user>@<realm>!<token-id>=TOKEN_SECRET
 ```
 
-Confirm the token has permission to clone and manage VMs. A first homelab setup may temporarily use `Administrator`; reduce privileges after the workflow works and do not keep that as the steady-state automation role.
+Confirm the token has permission to clone and manage VMs. A first private environment setup may temporarily use `Administrator`; reduce privileges after the workflow works and do not keep that as the steady-state automation role.
 
 If `platform-tools` is available on your operator workstation, check the Proxmox bootstrap prerequisites over SSH:
 

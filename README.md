@@ -49,7 +49,7 @@ Use Make targets from the repository root for setup, formatting, validation, and
 
 ## Platform Project
 
-This repository is one part of a multi-repository homelab platform project.
+This repository is one part of a multi-repository platform infrastructure project. The included `homelab` and `dev` roots are example environment names; the same workflow can be adapted for production environments with appropriate state, access control, review, backup, monitoring, and change-management controls.
 
 | Repository | Purpose |
 |---|---|
@@ -155,7 +155,7 @@ Secrets and key material stay outside Git:
 - SSH private keys: `~/.ssh`.
 - State files and plan files: ignored and not committed.
 
-The private workflow is production-grade in how it separates public code, private config, local secrets, SSH key material, and independent environment state. It does not make `homelab` or `dev` production environments.
+The private workflow separates public code, private config, local secrets, SSH key material, and independent environment state. That separation supports production-style workflows, but production use still requires environment-specific controls such as remote state with locking, reviewed plans, least-privilege credentials, backups, monitoring, and change management.
 
 Follow `docs/workflow.md` for the exact commands.
 

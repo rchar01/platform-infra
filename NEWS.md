@@ -8,6 +8,7 @@ README workflow and Proxmox disk-performance guidance.
 
 Highlights:
 
+- Reworded documentation and agent guidance so the included environment roots are clearly examples, not product limitations.
 - Added practical Proxmox disk-performance guidance for Linux VMs and documented which parts belong to infra versus guest configuration.
 - Updated the README header with a centered 256px project logo and separator.
 - Clarified when to use root Make helpers and when to run native `tofu` from an environment root.

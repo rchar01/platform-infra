@@ -4,7 +4,7 @@ This directory documents how `platform-infra` fits into the platform workspace a
 
 ## Start Here
 
-Read `workflow.md` first. It is the canonical step-by-step guide for local private setup, homelab and dev operations, validation-only checks, fallback testing, destroy, and CI workflow shape.
+Read `workflow.md` first. It is the canonical step-by-step guide for local private setup, environment operations for the included `homelab` and `dev` roots, validation-only checks, fallback testing, destroy, and CI workflow shape.
 
 Then use the supporting docs as references.
 

@@ -11,6 +11,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Cloud-init here is minimal: hostname, initial user, SSH key, IP addressing, and DNS intent only. Do not use it for complex OS configuration.
 - Additional virtual disks may be attached here, but partitioning, formatting, LVM, mounts, and `fstab` belong in `platform-config`.
 - Keep the shared platform lifecycle language aligned with `README.md` and `docs/workflow.md` when boundaries change.
+- Do not describe this project as homelab-only. `homelab` is an example environment root; the repository is general Proxmox/OpenTofu VM lifecycle infrastructure that can be adapted for production with appropriate state, access control, review, backup, monitoring, and change-management controls.
 
 ## Agent Workflow Expectations
 
@@ -35,6 +36,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 ## OpenTofu Workflow
 
 - Execution roots live under `environments/`; `homelab` and `dev` have independent state.
+- Treat `homelab` and `dev` as example environment names, not capability limits. Keep references to `environments/homelab`, `homelab.tfvars`, and `ENV=homelab` when documenting that root, but use neutral wording such as "private environment", "environment root", or "platform environment" for general workflow language.
 - Environment `versions.tf` files currently require OpenTofu `>= 1.11.7` and `bpg/proxmox` provider `~> 0.106`.
 - Prefer root Make targets for setup only: `make deps`, `make env`, `make init-ssh`, `make init`, `make fmt`, `make validate`.
 - Keep Make as the stable public task interface; put multi-step shell logic under `scripts/` and call it from Make.
@@ -81,5 +83,6 @@ make validate
 
 - Exact commands and required working directories.
 - Environment-specific gotchas around Proxmox tokens, datastores, bridges, template VM IDs, guest agent behavior, and state files.
+- Any wording that incorrectly frames the repository as homelab-only instead of production-capable infrastructure with required operational safeguards.
 - Any changes to platform ownership boundaries or deferred roadmap items.
 - Verification limits, especially when OpenTofu or Proxmox access is unavailable locally.

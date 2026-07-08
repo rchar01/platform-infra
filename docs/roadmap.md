@@ -4,7 +4,7 @@ This repository should stay small until the first independent environment provis
 
 ## Current Milestone
 
-Provision the homelab bastion VM from an existing Proxmox template, then keep `dev` as a separate state root for independent VM sets.
+Provision an environment bastion VM from an existing Proxmox template, then keep `dev` as a separate state root for independent VM sets.
 
 Acceptance targets:
 
@@ -29,7 +29,7 @@ Intentionally deferred until basic provisioning works:
 - Multi-node Proxmox behavior
 - Generated Ansible inventory files
 - Rich VM profile abstraction
-- Additional real host definitions beyond homelab/dev examples
+- Additional real host definitions beyond the included example environment roots
 - CI workflow implementation once project tooling stabilizes
 - CI apply after remote state with locking exists
 

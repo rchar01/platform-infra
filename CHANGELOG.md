@@ -13,6 +13,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Reworded public documentation and agent guidance so the included environment roots are presented as examples rather than product capability limits.
 - Reworked the README header with a centered 256px project logo and separator.
 - Clarified in the README when to use repository-root Make helper targets versus native `tofu` commands from environment roots.
 

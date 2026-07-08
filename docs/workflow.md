@@ -108,7 +108,7 @@ The token file should contain only the Proxmox token value:
 
 If the local token file is already non-empty, the automatic workflow refuses to overwrite it. Use `--force` only when intentionally replacing the token file. If the token already exists in Proxmox, Proxmox cannot show the existing secret; delete and recreate the token if the secret was lost.
 
-Create or refresh the private homelab config and per-VM cloud-init SSH keys:
+Create or refresh the private `homelab` environment config and per-VM cloud-init SSH keys:
 
 ```bash
 make env ENV=homelab PRIVATE=1
