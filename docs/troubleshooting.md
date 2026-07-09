@@ -14,11 +14,29 @@ This installs OpenTofu into `~/.local/bin/tofu` by default.
 
 `make deps` is idempotent. If the expected OpenTofu version is already installed in the configured `TOFU_INSTALL_DIR`, it skips the download.
 
+Override the OpenTofu version or install directory when needed:
+
+```bash
+make deps TOFU_VERSION=1.11.7 TOFU_INSTALL_DIR="$PWD/.tools/bin"
+```
+
 If `tofu` is still not found for direct shell use, either run `~/.local/bin/tofu` explicitly or add `~/.local/bin` to `PATH`. For CI or repo-local isolation, use:
 
 ```bash
 make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
+
+## Initialization Checklist
+
+If the first plan fails, confirm these steps completed in order:
+
+- `make deps`.
+- `platform-config-init`.
+- Proxmox token bootstrap with `platform-proxmox-token-init`.
+- `make env ENV=<env> PRIVATE=1`.
+- Private tfvars edited under `../platform-private/infra/`.
+- `make init-ssh ENV=<env> PRIVATE=1`.
+- Native `tofu init` from `environments/<env>`.
 
 ## Provider Download Fails
 

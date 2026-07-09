@@ -40,7 +40,8 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Environment `versions.tf` files currently require OpenTofu `>= 1.11.7` and `bpg/proxmox` provider `~> 0.106`.
 - Prefer root Make targets for setup only: `make deps`, `make env`, `make init-ssh`, `make init`, `make fmt`, `make validate`.
 - Keep Make as the stable public task interface; put multi-step shell logic under `scripts/` and call it from Make.
-- `make deps` installs OpenTofu into `~/.local/bin/tofu` by default. Override with `TOFU_INSTALL_DIR`, for example `TOFU_INSTALL_DIR="$PWD/.tools/bin"` in CI.
+- `make deps` installs OpenTofu into `~/.local/bin/tofu` by default. Override with `TOFU_VERSION` or `TOFU_INSTALL_DIR`, for example `TOFU_VERSION=1.11.7 TOFU_INSTALL_DIR="$PWD/.tools/bin"` in CI.
+- Keep initialization docs explicit that `make deps` installs the repo-pinned OpenTofu version and supports `TOFU_VERSION` and `TOFU_INSTALL_DIR` overrides.
 - `make env` and `make init-ssh` use local ignored config only for fallback testing; pass `PRIVATE=1` for the normal private workflow in `../platform-private/infra`.
 - Proxmox tokens for local operator runs normally live in `~/.config/platform-infrastructure/infra/proxmox.token` with `0600` permissions and are referenced by `proxmox_api_token_file`; do not store token values in `platform-private`.
 - Proxmox API user/token bootstrap belongs in `platform-tools` (`platform-proxmox-token-init`), not in this repo. This repo consumes an existing token.

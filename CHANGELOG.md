@@ -14,6 +14,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Clarified the infra initialization workflow, including `make deps` OpenTofu version and install-directory overrides.
 - Kept QEMU guest agent fstrim integration disabled by default and documented when to enable it deliberately.
 - Reworded public documentation and agent guidance so the included environment roots are presented as examples rather than product capability limits.
 - Reworked the README header with a centered 256px project logo and separator.

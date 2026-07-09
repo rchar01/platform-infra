@@ -45,6 +45,8 @@ make deps
 make help
 ```
 
+Initialization has three phases: install the repo-pinned OpenTofu binary with `make deps`, create private environment config and per-VM SSH keys, then run native `tofu init`, `validate`, and `plan` from the selected environment root. Use `TOFU_VERSION` or `TOFU_INSTALL_DIR` overrides when needed. See `docs/workflow.md#infra-initialization-summary` for the command sequence.
+
 Use Make targets from the repository root for setup, formatting, validation, and SSH key helpers. Use native `tofu` commands from the selected `environments/<env>` root for `plan`, `apply`, `destroy`, and output inspection after sourcing the matching private `.tofu.env` file.
 
 ## Platform Project

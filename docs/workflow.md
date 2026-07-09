@@ -44,16 +44,58 @@ Confirm these before running the first plan:
 - The sibling private repo exists at `../platform-private` or will be created before private config is committed.
 - Recommended `platform-tools` helpers are installed for normal local setup: `platform-config-init`, `platform-proxmox-token-init`, and `platform-ssh-init`.
 
+## Infra Initialization Summary
+
+Run setup helpers from the repository root. Run native `tofu` commands from the selected environment root.
+
+Install the repo-pinned OpenTofu version:
+
+```bash
+make deps
+```
+
+Override the OpenTofu version or install directory when needed:
+
+```bash
+make deps TOFU_VERSION=1.11.7 TOFU_INSTALL_DIR="$PWD/.tools/bin"
+```
+
+Initialize local private config, credentials, environment values, and per-VM SSH keys:
+
+```bash
+platform-config-init
+platform-proxmox-token-init ... --check
+platform-proxmox-token-init ...
+
+make env ENV=<env> PRIVATE=1
+$EDITOR ../platform-private/infra/<env>.tfvars
+make init-ssh ENV=<env> PRIVATE=1
+make validate ENV=<env>
+```
+
+Run OpenTofu from the selected environment root:
+
+```bash
+cd environments/<env>
+source "../../../platform-private/infra/<env>.tofu.env"
+
+~/.local/bin/tofu init
+~/.local/bin/tofu validate
+~/.local/bin/tofu plan
+```
+
+Only run `tofu apply` after reviewing the selected environment, tfvars, state root, and plan.
+
 Install the repo-pinned OpenTofu binary:
 
 ```bash
 make deps
 ```
 
-By default this installs `~/.local/bin/tofu`. Use `TOFU_INSTALL_DIR` when you need a different location:
+By default this installs `~/.local/bin/tofu`. Use `TOFU_VERSION` or `TOFU_INSTALL_DIR` when you need a different version or location:
 
 ```bash
-make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make deps TOFU_VERSION=1.11.7 TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 ## One-Time Local Private Setup

@@ -8,6 +8,7 @@ README workflow and Proxmox disk-performance guidance.
 
 Highlights:
 
+- Added a clearer infra initialization summary, including OpenTofu version and install-directory overrides for `make deps`.
 - Added explicit Proxmox disk performance defaults for VirtIO SCSI single, disk IO threads, discard/TRIM, cache mode, and raw disk format.
 - Kept QEMU guest agent fstrim disabled by default and documented when to enable it deliberately.
 - Reworded documentation and agent guidance so the included environment roots are clearly examples, not product limitations.
