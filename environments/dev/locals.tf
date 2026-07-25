@@ -1,6 +1,6 @@
 locals {
-  default_tags = ["managed-by-tofu"]
   environment  = "dev"
+  default_tags = ["managed-by-tofu", local.environment]
 
   config_root = var.config_root == null ? path.root : (
     startswith(pathexpand(var.config_root), "/")

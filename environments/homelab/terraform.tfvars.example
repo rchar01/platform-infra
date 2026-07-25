@@ -25,7 +25,7 @@ vms = {
     vm_id       = 101
     hostname    = "example-homelab-gitlab-01.example.test"
     description = "Example homelab GitLab VM"
-    tags        = ["rocky", "homelab", "gitlab", "scm"]
+    tags        = ["rocky", "gitlab", "scm"]
 
     cores              = 4
     cpu_type           = "host"
