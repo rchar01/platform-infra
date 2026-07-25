@@ -85,12 +85,12 @@ VM declarations must not need to repeat them.
 - [x] Update `environments/homelab/locals.tf` so `default_tags` contains
       `managed-by-tofu` and `local.environment`.
 - [x] Update `environments/dev/locals.tf` the same way.
-- [ ] Use the same rule in `environments/snapshot-test/locals.tf`.
+- [x] Use the same rule in `environments/snapshot-test/locals.tf`.
 - [x] Preserve `sort(distinct(var.tags))` in `modules/proxmox-vm/main.tf` so
       migration-time duplicate tags remain harmless.
 - [x] Remove manually repeated environment tags from public examples and the
       corresponding private VM declarations in the same reviewed checkpoint.
-- [ ] Confirm each existing-root plan contains either no effective tag change
+- [x] Confirm each existing-root plan contains either no effective tag change
       or only the explicitly reviewed in-place environment-tag update.
 - [ ] Confirm no existing-root plan contains a VM replacement, deletion, disk,
       CPU, memory, or network change.
@@ -116,20 +116,20 @@ plans first.
 Create `environments/snapshot-test/` following the existing environment-root
 structure:
 
-- [ ] Add `main.tf` using `../../modules/proxmox-vm` with
+- [x] Add `main.tf` using `../../modules/proxmox-vm` with
       `for_each = var.vms`.
-- [ ] Add `locals.tf` with `environment = "snapshot-test"`, automatic tags,
+- [x] Add `locals.tf` with `environment = "snapshot-test"`, automatic tags,
       config-root resolution, token-file resolution, and per-VM SSH key paths.
-- [ ] Add `variables.tf` with the existing root input contract.
-- [ ] Add `outputs.tf` with VM names, IDs, configured addresses, guest-agent
+- [x] Add `variables.tf` with the existing root input contract.
+- [x] Add `outputs.tf` with VM names, IDs, configured addresses, guest-agent
       addresses, and the inventory handoff map.
-- [ ] Add `providers.tf` and `versions.tf` matching the supported OpenTofu and
+- [x] Add `providers.tf` and `versions.tf` matching the supported OpenTofu and
       `bpg/proxmox` constraints.
-- [ ] Add `terraform.tfvars.example` using only RFC 5737 addresses and neutral
+- [x] Add `terraform.tfvars.example` using only RFC 5737 addresses and neutral
       identifiers.
-- [ ] Add `README.md` describing the root as disposable and state-isolated.
-- [ ] Run `tofu init` and commit `.terraform.lock.hcl`.
-- [ ] Confirm state, plans, and `.terraform/` remain ignored.
+- [x] Add `README.md` describing the root as disposable and state-isolated.
+- [x] Run `tofu init` and include `.terraform.lock.hcl` with the root change.
+- [x] Confirm state, plans, and `.terraform/` remain ignored.
 
 Reuse the existing module. Do not add a second snapshot-specific VM module.
 
@@ -196,13 +196,13 @@ make verify ENV=snapshot-test
 
 Validation gate:
 
-- [ ] OpenTofu formatting passes.
-- [ ] All three roots initialize and validate.
+- [x] OpenTofu formatting passes.
+- [x] All three roots initialize and validate.
 - [ ] Existing Make and SSH-key helpers accept `ENV=snapshot-test` without
       special cases.
-- [ ] Public examples contain only documentation addresses and neutral names.
+- [x] Public examples contain only documentation addresses and neutral names.
 - [ ] No state, plan, token, key, or private value is staged.
-- [ ] `git diff --check` passes.
+- [x] `git diff --check` passes.
 - [ ] Final diffs in both repositories contain no unrelated changes.
 
 `make verify` does not run `tofu plan`. After static checks, run native private
@@ -421,6 +421,7 @@ If snapshot deletion, rollback, or lock handling fails:
 | 2026-07-25 | Chose a separate existing-root tag reconciliation checkpoint and private detailed acceptance evidence. | User decisions recorded before implementation |
 | 2026-07-25 | Added root-derived environment tags and removed redundant dev tags from public and private declarations. Static validation passed; live plans remain pending. | `environments/{homelab,dev}/locals.tf`, public examples, private `dev.tfvars` |
 | 2026-07-25 | Homelab and dev private plans completed with no create, replace, or destroy actions. Dev has no effective tag change; homelab adds its environment tag. Both plans also contain previously pending discard and IO-thread disk updates, so no tag apply was performed. | Redacted local plan review; private identifiers omitted |
+| 2026-07-25 | Added and initialized the state-isolated public snapshot-test root with two neutral disposable VM examples. | `environments/snapshot-test/`; OpenTofu 1.11.7 validation with provider 0.106.0 |
 
 ## Decision Log
 
