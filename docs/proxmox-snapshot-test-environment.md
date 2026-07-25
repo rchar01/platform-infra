@@ -149,8 +149,8 @@ In `platform-private/infra/`:
       arguments while applying it.
 - [x] Reference the outside-Git token file; do not embed a token.
 - [x] Check candidate VMIDs against live Proxmox before planning.
-- [ ] Check candidate addresses against DHCP, DNS, and network inventory before
-      planning.
+- [x] Check candidate addresses against DHCP, DNS, and network inventory before
+      generating the final provisioning plan.
 - [x] Do not commit generated private keys.
 
 Generate dedicated cloud-init SSH keys from the public repository root:
@@ -226,9 +226,8 @@ Before applying:
 
 - [x] Confirm the target is a supported single-node Proxmox VE 9 host.
 - [x] Confirm both candidate VMIDs are unused.
-- [ ] Confirm both candidate addresses are unused through authoritative DHCP
-      and network inventory. Preliminary ping and resolver checks found no
-      response.
+- [x] Confirm both candidate addresses are unused through authoritative DHCP
+      and network inventory.
 - [x] Confirm the selected template exists and can be cloned.
 - [x] Confirm the selected storage supports VM snapshots.
 - [x] Confirm storage has room for two full clones, two additional disks, and
@@ -239,7 +238,7 @@ Before applying:
 - [x] Confirm the run is specifically against a single-node Proxmox VE 9 host;
       other Proxmox versions and multi-node clusters are outside this
       acceptance scope.
-- [ ] Record only sanitized evidence in the public progress log.
+- [x] Record only sanitized evidence in the public progress log.
 
 Stop if any candidate identifier is already in use. Do not silently choose new
 private values without updating and reviewing the private configuration.
@@ -259,7 +258,10 @@ Approval gate:
 - [x] No existing VM is updated, replaced, stopped, or destroyed.
 - [x] Names, VMIDs, disks, addresses, tags, and SSH keys match the reviewed
       private values.
-- [ ] The user explicitly approves the saved plan.
+- [ ] The user explicitly approves the generated saved plan. Provisioning was
+      authorized conditionally before regeneration, and machine inspection
+      confirmed exactly the two reviewed creates and no other actions, but no
+      separate post-generation approval was recorded.
 
 Apply the saved plan without injecting variable arguments:
 
@@ -273,14 +275,14 @@ different environment file was sourced.
 
 After apply:
 
-- [ ] Both VMs appear in OpenTofu state and Proxmox.
-- [ ] Both contain exactly one `managed-by-tofu` tag and exactly one
+- [x] Both VMs appear in OpenTofu state and Proxmox.
+- [x] Both contain exactly one `managed-by-tofu` tag and exactly one
       `snapshot-test` tag while retaining the reviewed explicit tags.
-- [ ] No unrelated VM has the `snapshot-test` tag.
-- [ ] Guest SSH works with each dedicated key.
-- [ ] QEMU guest-agent status is healthy.
-- [ ] Boot and additional disks are visible.
-- [ ] Neither VM belongs to a platform service inventory.
+- [x] No unrelated VM has the `snapshot-test` tag.
+- [x] Guest SSH works with each dedicated key.
+- [x] QEMU guest-agent status is healthy.
+- [x] Boot and additional disks are visible.
+- [x] Neither VM belongs to a platform service inventory.
 
 ## Phase 8: Platform-Tools Acceptance Handoff
 
@@ -408,8 +410,7 @@ If snapshot deletion, rollback, or lock handling fails:
 
 ## Open Questions
 
-- [ ] Private VMIDs are confirmed unused; candidate addresses still require
-      authoritative DHCP and network-inventory confirmation.
+- [x] Private VMIDs and addresses were confirmed unused before provisioning.
 - [x] The selected datastore has enough capacity for both test VMs and
       memory snapshots.
 - [x] Detailed evidence uses the private infrastructure acceptance log under
@@ -428,6 +429,7 @@ If snapshot deletion, rollback, or lock handling fails:
 | 2026-07-25 | Added private snapshot-test values, environment arguments, acceptance log, and dedicated SSH keys after live collision/tool/storage preflight. | `platform-private/infra/`; generated keys remain outside Git |
 | 2026-07-25 | Created a saved private plan with exactly two VM creates and no other actions. The plan remains unapplied pending explicit approval. | Ignored `environments/snapshot-test/snapshot-test.tfplan`; private details omitted |
 | 2026-07-25 | Public verification and publication scans passed. Candidate addresses had no ping or resolver response, but authoritative DHCP/network confirmation remains pending. | Three-root `make verify`; tracked-content publication scan; sanitized private preflight |
+| 2026-07-25 | After address confirmation and explicit conditional provisioning authorization, regenerated, machine-validated, and applied an exact two-create saved plan. No separate post-generation approval was recorded. Both disposable VMs are running with the reviewed identities, tags, disks, SSH access, and healthy guest agents; a post-apply plan reports no drift. No disk formatting or snapshot mutation was performed. | OpenTofu state and refresh plan; direct Proxmox and guest verification; private acceptance log |
 
 ## Decision Log
 
