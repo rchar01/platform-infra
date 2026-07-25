@@ -9,6 +9,7 @@ Run this on every pull request. It verifies formatting, initialization, and stat
 ```bash
 make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 `make verify` installs the pinned OpenTofu binary through `make deps` when needed.
@@ -101,6 +102,7 @@ The invariant is strict:
 ```text
 environments/homelab uses platform-private/infra/homelab.tfvars
 environments/dev uses platform-private/infra/dev.tfvars
+environments/snapshot-test uses platform-private/infra/snapshot-test.tfvars
 ```
 
-Never run `dev.tfvars` from `environments/homelab`, and never run `homelab.tfvars` from `environments/dev`.
+Never cross-use tfvars between roots. CI may initialize and validate `snapshot-test`, but live snapshot mutation and rollback remain manual acceptance operations.

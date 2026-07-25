@@ -35,7 +35,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 
 ## OpenTofu Workflow
 
-- Execution roots live under `environments/`; `homelab` and `dev` have independent state.
+- Execution roots live under `environments/`; `homelab`, `dev`, and `snapshot-test` have independent state.
 - Treat `homelab` and `dev` as example environment names, not capability limits. Keep references to `environments/homelab`, `homelab.tfvars`, and `ENV=homelab` when documenting that root, but use neutral wording such as "private environment", "environment root", or "platform environment" for general workflow language.
 - Environment `versions.tf` files currently require OpenTofu `>= 1.11.7` and `bpg/proxmox` provider `~> 0.106`.
 - Prefer root Make targets for setup only: `make deps`, `make env`, `make init-ssh`, `make init`, `make fmt`, `make validate`.
@@ -47,8 +47,9 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Proxmox API user/token bootstrap belongs in `platform-tools` (`platform-proxmox-token-init`), not in this repo. This repo consumes an existing token.
 - Per-VM cloud-init SSH keys are generated under `~/.ssh` by `platform-ssh-init`; private Git stores only non-secret config and references.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
-- For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root; it sets `TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy` with private config paths.
-- Do not run `dev.tfvars` from `environments/homelab` or `homelab.tfvars` from `environments/dev`.
+- For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root. Homelab and dev set plan, apply, and destroy arguments; snapshot-test intentionally unsets apply arguments and requires saved-plan apply.
+- Never cross-use tfvars or state between environment roots.
+- `snapshot-test` owns two disposable VMs for manual `platform-proxmox-vm-snapshot` acceptance. Do not add services or guest disk preparation here, and do not apply, mutate snapshots, or destroy without the explicit gates in `docs/proxmox-snapshot-test-environment.md`.
 - Normal Make command order:
 
 ```bash
@@ -72,7 +73,8 @@ make validate
 ## Current Implementation Facts
 
 - `modules/proxmox-vm/` wraps one `proxmox_virtual_environment_vm` cloned from an existing template.
-- `environments/homelab/main.tf` and `environments/dev/main.tf` instantiate the module with `for_each = var.vms`.
+- Every environment root instantiates `modules/proxmox-vm` with `for_each = var.vms`.
+- Every root automatically adds `managed-by-tofu` and its environment name; per-VM declarations contain only role-specific tags.
 - `cloud_init_username` defaults to `rocky` for Rocky cloud templates.
 - `agent_enabled` defaults to `true`, but the template must actually install and start `qemu-guest-agent`; that responsibility is outside this repo.
 - `memory_mb` is the Proxmox maximum memory value; optional per-VM `memory_floating_mb` sets the Proxmox ballooned minimum memory value.

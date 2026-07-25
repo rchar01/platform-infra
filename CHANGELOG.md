@@ -9,11 +9,14 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added an independent two-VM `snapshot-test` root for manual live acceptance of `platform-proxmox-vm-snapshot`.
+- Added a documented saved-plan workflow and safety gates for creating and destroying disposable snapshot-test VMs.
 - Added explicit Proxmox disk performance defaults for VirtIO SCSI single, disk IO threads, discard/TRIM, cache mode, and raw disk format, with root, VM, and additional-disk override support.
 - Documented Proxmox disk-performance guidance for Linux VMs, including the boundary between infra-owned virtual disk settings and guest-owned filesystem configuration.
 
 ### Changed
 
+- Environment roots now add `managed-by-tofu` and their environment name automatically; per-VM tags are role-specific.
 - Clarified the infra initialization workflow, including `make deps` OpenTofu version and install-directory overrides.
 - Kept QEMU guest agent fstrim integration disabled by default and documented when to enable it deliberately.
 - Reworded public documentation and agent guidance so the included environment roots are presented as examples rather than product capability limits.

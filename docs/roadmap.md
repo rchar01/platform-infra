@@ -2,7 +2,7 @@
 
 This repository should stay small until the first independent environment provisioning milestone is reliable.
 
-## Current Milestone
+## Current Milestones
 
 Provision an environment bastion VM from an existing Proxmox template, then keep `dev` as a separate state root for independent VM sets.
 
@@ -18,6 +18,18 @@ Acceptance targets:
 - `tofu destroy` removes the VM
 - `homelab.tfvars` is used only from `environments/homelab`
 - `dev.tfvars` is used only from `environments/dev`
+
+Validate the on-demand Proxmox development snapshot helper against two
+disposable VMs in an independent `snapshot-test` root.
+
+Acceptance targets:
+
+- Automatic ownership and environment tags select exactly the disposable pair.
+- Existing service VMs are never snapshot-test targets.
+- Create, list, rollback, and delete work for exact VM and environment selection.
+- Multi-VM operations are treated as serial and non-atomic.
+- The disposable pair is destroyed through its reviewed OpenTofu state after acceptance.
+- Detailed private evidence stays outside this public repository.
 
 ## Deferred Work
 

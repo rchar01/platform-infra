@@ -8,6 +8,8 @@ README workflow and Proxmox disk-performance guidance.
 
 Highlights:
 
+- Added an independent disposable `snapshot-test` root for live acceptance of the Proxmox development snapshot helper.
+- Added automatic ownership and environment tags to support exact environment selection by operator tools, together with mandatory target-set review before mutation.
 - Added a clearer infra initialization summary, including OpenTofu version and install-directory overrides for `make deps`.
 - Added explicit Proxmox disk performance defaults for VirtIO SCSI single, disk IO threads, discard/TRIM, cache mode, and raw disk format.
 - Kept QEMU guest agent fstrim disabled by default and documented when to enable it deliberately.

@@ -28,6 +28,7 @@ platform-template-builder -> platform-infra -> platform-config
 - Run native `tofu` commands from the selected environment root.
 - Use `environments/homelab` only with `homelab.tfvars` and homelab state.
 - Use `environments/dev` only with `dev.tfvars` and dev state.
+- Use `environments/snapshot-test` only with `snapshot-test.tfvars` and its disposable acceptance state.
 - Do not keep a local `environments/<env>/terraform.tfvars` file for the normal private workflow.
 - Do not commit real tfvars, state files, plan files, Proxmox tokens, or SSH private keys.
 - Run `tofu apply` and `tofu destroy` only after reviewing the selected environment and plan.
@@ -166,6 +167,15 @@ $EDITOR ../platform-private/infra/dev.tfvars
 make init-ssh ENV=dev PRIVATE=1
 ```
 
+Create or refresh the disposable snapshot-test config and keys only for a live
+acceptance run:
+
+```bash
+make env ENV=snapshot-test PRIVATE=1
+$EDITOR ../platform-private/infra/snapshot-test.tfvars
+make init-ssh ENV=snapshot-test PRIVATE=1
+```
+
 The private tfvars files should reference the token file path, not the token value:
 
 ```hcl
@@ -180,11 +190,13 @@ Expected private layout:
 ../platform-private/infra/
   homelab.tfvars
   dev.tfvars
+  snapshot-test.tfvars
   homelab.tofu.env
   dev.tofu.env
+  snapshot-test.tofu.env
 ```
 
-The `.tofu.env` files contain no secrets. They set `TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy` so local operator commands use the matching private tfvars and `config_root`.
+The `.tofu.env` files contain no secrets. Homelab and dev set `TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy`. Snapshot-test sets plan and destroy arguments but intentionally unsets apply arguments so applying requires a reviewed saved plan.
 
 `make init-ssh` reads the selected environment's `vms` map and generates one local cloud-init SSH keypair per VM with `platform-ssh-init`. The default key path pattern is:
 
@@ -258,6 +270,42 @@ Apply only after reviewing the plan:
 ~/.local/bin/tofu apply
 ```
 
+## Snapshot Test Workflow
+
+Use this root only for explicitly approved live acceptance of
+`platform-proxmox-vm-snapshot`. Run setup helpers from the repository root:
+
+```bash
+make deps
+make env ENV=snapshot-test PRIVATE=1
+make init-ssh ENV=snapshot-test PRIVATE=1
+make validate ENV=snapshot-test
+```
+
+Run OpenTofu from the disposable root and create a saved plan:
+
+```bash
+cd environments/snapshot-test
+source "../../../platform-private/infra/snapshot-test.tofu.env"
+
+~/.local/bin/tofu init
+~/.local/bin/tofu validate
+~/.local/bin/tofu plan -out=snapshot-test.tfplan
+```
+
+Apply only after confirming the saved plan creates exactly the two reviewed
+disposable VMs and changes no existing resource:
+
+```bash
+TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test.tfplan
+```
+
+The environment file intentionally leaves apply arguments unset because saved
+plans already contain their input values. Follow
+`proxmox-snapshot-test-environment.md` for live preflight, snapshot operations,
+private evidence, and reviewed destruction. Do not enroll these VMs in normal
+platform services.
+
 ## Switching Environments
 
 Use a new shell or source the matching env file whenever switching environment roots:
@@ -274,7 +322,13 @@ cd environments/dev
 source "../../../platform-private/infra/dev.tofu.env"
 ```
 
-Do not run `dev.tfvars` from `environments/homelab`, and do not run `homelab.tfvars` from `environments/dev`. Each root has independent state and an independent VM set.
+```bash
+cd environments/snapshot-test
+source "../../../platform-private/infra/snapshot-test.tofu.env"
+```
+
+Never cross-use tfvars or state between roots. Each root has an independent VM
+set, and selecting another root's tfvars can produce destructive plans.
 
 ## Review and Apply
 
@@ -313,7 +367,20 @@ rm -f destroy.tfplan
 ~/.local/bin/tofu state list
 ```
 
-Use `environments/dev` and `dev.tofu.env` for dev destroys.
+Use `environments/dev` and `dev.tofu.env` for dev destroys. Snapshot-test has a
+stricter saved destroy-plan workflow in
+`proxmox-snapshot-test-environment.md`; use it only after deleting test
+snapshots and obtaining explicit approval:
+
+```bash
+cd environments/snapshot-test
+source "../../../platform-private/infra/snapshot-test.tofu.env"
+~/.local/bin/tofu plan -destroy -out=snapshot-test-destroy.tfplan
+TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test-destroy.tfplan
+```
+
+The reviewed destroy plan must contain exactly the two disposable VMs and no
+other resource.
 
 Prefer this over deleting VMs manually in Proxmox. Manual deletion leaves OpenTofu state stale and requires state repair.
 
@@ -324,6 +391,7 @@ Use this before review or commit. It does not contact Proxmox and does not need 
 ```bash
 make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 Equivalent local checks with the default install path are:
@@ -331,6 +399,7 @@ Equivalent local checks with the default install path are:
 ```bash
 make verify
 make verify ENV=dev
+make verify ENV=snapshot-test
 ```
 
 ## Local Fallback Workflow
@@ -361,6 +430,7 @@ Secret-free CI validation can run on every pull request:
 make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 This validates formatting, initialization, and static OpenTofu configuration without private tfvars or Proxmox credentials.

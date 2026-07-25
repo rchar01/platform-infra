@@ -137,21 +137,21 @@ Reuse the existing module. Do not add a second snapshot-specific VM module.
 
 In `platform-private/infra/`:
 
-- [ ] Add `snapshot-test.tfvars` with the reviewed private endpoint, node,
+- [x] Add `snapshot-test.tfvars` with the reviewed private endpoint, node,
       bridge, storage, DNS, gateway, template, VMIDs, and addresses.
-- [ ] Add exactly two disposable VM declarations with a small additional disk
+- [x] Add exactly two disposable VM declarations with a small additional disk
       so live acceptance exercises multi-disk snapshots.
-- [ ] Add `snapshot-test.tofu.env` that sets `TF_CLI_ARGS_plan` and
+- [x] Add `snapshot-test.tofu.env` that sets `TF_CLI_ARGS_plan` and
       `TF_CLI_ARGS_destroy` to the matching tfvars and explicitly unsets
       `TF_CLI_ARGS_apply`.
-- [ ] Require saved-plan apply for this environment. A saved plan already
+- [x] Require saved-plan apply for this environment. A saved plan already
       contains its input values, and OpenTofu rejects `-var` or `-var-file`
       arguments while applying it.
-- [ ] Reference the outside-Git token file; do not embed a token.
-- [ ] Check candidate VMIDs against live Proxmox before planning.
+- [x] Reference the outside-Git token file; do not embed a token.
+- [x] Check candidate VMIDs against live Proxmox before planning.
 - [ ] Check candidate addresses against DHCP, DNS, and network inventory before
       planning.
-- [ ] Do not commit generated private keys.
+- [x] Do not commit generated private keys.
 
 Generate dedicated cloud-init SSH keys from the public repository root:
 
@@ -168,17 +168,17 @@ The expected path pattern is:
 ## Phase 4: Documentation Integration
 
 - [x] Add this document to `docs/README.md`.
-- [ ] Update `README.md` to list the new root and matching private files.
-- [ ] Update `docs/workflow.md` with setup, plan, apply, and destroy commands.
-- [ ] Update `docs/requirements.md` with private config expectations.
-- [ ] Update `docs/state.md` with the new independent-state invariant.
-- [ ] Update `docs/troubleshooting.md` with root/tfvars mismatch guidance.
-- [ ] Update `docs/ci.md` so secret-free validation includes `snapshot-test`.
-- [ ] Update `docs/roadmap.md` with the disposable snapshot acceptance
+- [x] Update `README.md` to list the new root and matching private files.
+- [x] Update `docs/workflow.md` with setup, plan, apply, and destroy commands.
+- [x] Update `docs/requirements.md` with private config expectations.
+- [x] Update `docs/state.md` with the new independent-state invariant.
+- [x] Update `docs/troubleshooting.md` with root/tfvars mismatch guidance.
+- [x] Update `docs/ci.md` so secret-free validation includes `snapshot-test`.
+- [x] Update `docs/roadmap.md` with the disposable snapshot acceptance
       milestone.
-- [ ] Update `AGENTS.md` with the lasting snapshot-test ownership and safety
+- [x] Update `AGENTS.md` with the lasting snapshot-test ownership and safety
       rules.
-- [ ] Update the current `Unreleased` sections in `NEWS.md` and
+- [x] Update the current `Unreleased` sections in `NEWS.md` and
       `CHANGELOG.md`.
 
 Documentation must state that snapshots are temporary rollback points, not
@@ -198,12 +198,12 @@ Validation gate:
 
 - [x] OpenTofu formatting passes.
 - [x] All three roots initialize and validate.
-- [ ] Existing Make and SSH-key helpers accept `ENV=snapshot-test` without
+- [x] Existing Make and SSH-key helpers accept `ENV=snapshot-test` without
       special cases.
 - [x] Public examples contain only documentation addresses and neutral names.
-- [ ] No state, plan, token, key, or private value is staged.
+- [x] No state, plan, token, key, or private value is staged.
 - [x] `git diff --check` passes.
-- [ ] Final diffs in both repositories contain no unrelated changes.
+- [x] Final diffs in both repositories contain no unrelated changes.
 
 `make verify` does not run `tofu plan`. After static checks, run native private
 plans independently from each matching root after sourcing its matching
@@ -224,17 +224,19 @@ Review every match rather than assuming the search is clean.
 
 Before applying:
 
-- [ ] Confirm the target is a supported single-node Proxmox VE 9 host.
-- [ ] Confirm both candidate VMIDs are unused.
-- [ ] Confirm both candidate addresses are unused.
-- [ ] Confirm the selected template exists and can be cloned.
-- [ ] Confirm the selected storage supports VM snapshots.
-- [ ] Confirm storage has room for two full clones, two additional disks, and
+- [x] Confirm the target is a supported single-node Proxmox VE 9 host.
+- [x] Confirm both candidate VMIDs are unused.
+- [ ] Confirm both candidate addresses are unused through authoritative DHCP
+      and network inventory. Preliminary ping and resolver checks found no
+      response.
+- [x] Confirm the selected template exists and can be cloned.
+- [x] Confirm the selected storage supports VM snapshots.
+- [x] Confirm storage has room for two full clones, two additional disks, and
       saved memory state during testing.
-- [ ] Confirm the Proxmox host has `bash`, `pvesh`, and `jq`, plus `qm` for
+- [x] Confirm the Proxmox host has `bash`, `pvesh`, and `jq`, plus `qm` for
       mutations.
-- [ ] Confirm an SSH operator workstation has local `bash`, `ssh`, and `jq`.
-- [ ] Confirm the run is specifically against a single-node Proxmox VE 9 host;
+- [x] Confirm an SSH operator workstation has local `bash`, `ssh`, and `jq`.
+- [x] Confirm the run is specifically against a single-node Proxmox VE 9 host;
       other Proxmox versions and multi-node clusters are outside this
       acceptance scope.
 - [ ] Record only sanitized evidence in the public progress log.
@@ -253,9 +255,9 @@ tofu plan -out=snapshot-test.tfplan
 
 Approval gate:
 
-- [ ] The plan contains exactly two VM creates.
-- [ ] No existing VM is updated, replaced, stopped, or destroyed.
-- [ ] Names, VMIDs, disks, addresses, tags, and SSH keys match the reviewed
+- [x] The plan contains exactly two VM creates.
+- [x] No existing VM is updated, replaced, stopped, or destroyed.
+- [x] Names, VMIDs, disks, addresses, tags, and SSH keys match the reviewed
       private values.
 - [ ] The user explicitly approves the saved plan.
 
@@ -406,11 +408,12 @@ If snapshot deletion, rollback, or lock handling fails:
 
 ## Open Questions
 
-- [ ] Which private VMIDs and addresses are confirmed unused by live inventory?
-- [ ] Does the selected datastore have enough capacity for both test VMs and
-      memory snapshots?
-- [ ] Which private run-log path follows the existing `platform-private`
-      documentation convention?
+- [ ] Private VMIDs are confirmed unused; candidate addresses still require
+      authoritative DHCP and network-inventory confirmation.
+- [x] The selected datastore has enough capacity for both test VMs and
+      memory snapshots.
+- [x] Detailed evidence uses the private infrastructure acceptance log under
+      `platform-private/infra/plans/`.
 
 ## Progress Log
 
@@ -422,6 +425,9 @@ If snapshot deletion, rollback, or lock handling fails:
 | 2026-07-25 | Added root-derived environment tags and removed redundant dev tags from public and private declarations. Static validation passed; live plans remain pending. | `environments/{homelab,dev}/locals.tf`, public examples, private `dev.tfvars` |
 | 2026-07-25 | Homelab and dev private plans completed with no create, replace, or destroy actions. Dev has no effective tag change; homelab adds its environment tag. Both plans also contain previously pending discard and IO-thread disk updates, so no tag apply was performed. | Redacted local plan review; private identifiers omitted |
 | 2026-07-25 | Added and initialized the state-isolated public snapshot-test root with two neutral disposable VM examples. | `environments/snapshot-test/`; OpenTofu 1.11.7 validation with provider 0.106.0 |
+| 2026-07-25 | Added private snapshot-test values, environment arguments, acceptance log, and dedicated SSH keys after live collision/tool/storage preflight. | `platform-private/infra/`; generated keys remain outside Git |
+| 2026-07-25 | Created a saved private plan with exactly two VM creates and no other actions. The plan remains unapplied pending explicit approval. | Ignored `environments/snapshot-test/snapshot-test.tfplan`; private details omitted |
+| 2026-07-25 | Public verification and publication scans passed. Candidate addresses had no ping or resolver response, but authoritative DHCP/network confirmation remains pending. | Three-root `make verify`; tracked-content publication scan; sanitized private preflight |
 
 ## Decision Log
 

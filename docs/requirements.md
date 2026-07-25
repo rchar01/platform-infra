@@ -49,18 +49,21 @@ The Proxmox API token can be provided directly with `proxmox_api_token`, but loc
 
 Example tfvars keep `proxmox_insecure = false` so TLS verification is enabled by default. If a private environment still uses a self-signed or otherwise untrusted Proxmox certificate, prefer installing the Proxmox CA or using a valid certificate. Set `proxmox_insecure = true` only as an explicit private/local override after accepting the token exposure risk on that network path.
 
-Private repository configs should not contain the token value. They may contain normal private configuration such as `homelab.tfvars`, `dev.tfvars`, `homelab.tofu.env`, and `dev.tofu.env`.
+Private repository configs should not contain the token value. They may contain normal private configuration such as the matching `*.tfvars` and `*.tofu.env` files for each environment root.
 
 See `proxmox-api-token.md` for Proxmox user, token, and ACL setup guidance for the first apply.
 
 ## OpenTofu Roots
 
-`homelab` and `dev` are independent environment roots:
+The maintained OpenTofu roots are independent:
 
 - `environments/homelab` uses homelab state and `homelab.tfvars`.
 - `environments/dev` uses dev state and `dev.tfvars`.
+- `environments/snapshot-test` uses disposable acceptance state and `snapshot-test.tfvars`.
 
 Use native OpenTofu for `plan`, `apply`, and `destroy` from the selected environment root. Use Make targets from the repository root for setup, formatting, and validation helpers.
+
+Live snapshot acceptance additionally requires a single-node Proxmox VE 9 host with `bash`, `pvesh`, `jq`, and `qm`, plus enough snapshot-capable storage for two disposable clones, their additional disks, and optional saved memory state. See `proxmox-snapshot-test-environment.md`.
 
 ## CI Requirements
 

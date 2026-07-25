@@ -51,7 +51,7 @@ Use Make targets from the repository root for setup, formatting, validation, and
 
 ## Platform Project
 
-This repository is one part of a multi-repository platform infrastructure project. The included `homelab` and `dev` roots are example environment names; the same workflow can be adapted for production environments with appropriate state, access control, review, backup, monitoring, and change-management controls.
+This repository is one part of a multi-repository platform infrastructure project. The included `homelab` and `dev` roots are example environment names; the same workflow can be adapted for production environments with appropriate state, access control, review, backup, monitoring, and change-management controls. The `snapshot-test` root is a disposable acceptance fixture, not a production profile.
 
 | Repository | Purpose |
 |---|---|
@@ -149,8 +149,10 @@ The normal operator workflow uses a sibling private repository for environment v
 ../platform-private/infra/
   homelab.tfvars
   dev.tfvars
+  snapshot-test.tfvars
   homelab.tofu.env
   dev.tofu.env
+  snapshot-test.tofu.env
 ```
 
 Secrets and key material stay outside Git:
@@ -171,8 +173,11 @@ Current roots:
 
 - `environments/homelab`.
 - `environments/dev`.
+- `environments/snapshot-test`, a disposable two-VM acceptance root.
 
-Do not use `dev.tfvars` from `environments/homelab`, and do not use `homelab.tfvars` from `environments/dev`. Switching VM sets inside one state root can make OpenTofu plan to destroy resources that disappeared from the selected config.
+Each root must use only its matching tfvars and state. Switching VM sets inside one state root can make OpenTofu plan to destroy resources that disappeared from the selected config.
+
+The snapshot-test root provisions disposable VMs for live testing of `platform-proxmox-vm-snapshot`. Keep its state and private config for repeatability, but destroy the VMs after acceptance. See `docs/proxmox-snapshot-test-environment.md`.
 
 To remove managed VMs, use the destroy workflow in `docs/workflow.md` from the selected environment root. Do not delete OpenTofu-managed VMs manually in Proxmox unless you are intentionally repairing state.
 
