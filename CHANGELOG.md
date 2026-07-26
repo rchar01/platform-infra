@@ -7,6 +7,10 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [1.4.0] - 2026-07-26
+
 ### Added
 
 - Added an independent two-VM `snapshot-test` root for manual live acceptance of `platform-proxmox-vm-snapshot`.
@@ -23,6 +27,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Reworded public documentation and agent guidance so the included environment roots are presented as examples rather than product capability limits.
 - Reworked the README header with a centered 256px project logo and separator.
 - Clarified in the README when to use repository-root Make helper targets versus native `tofu` commands from environment roots.
+- Existing environments can plan Proxmox tag, SCSI controller, and disk-attribute updates after upgrading; review plans before applying because some disk or controller changes may require VM shutdown.
 
 ## [1.3.1] - 2026-05-26
 
