@@ -1,75 +1,52 @@
-# Proxmox Snapshot Test Environment Handoff
+# Proxmox Snapshot Test Environment
 
-## Goal
+## Purpose
 
-Add an isolated, reusable OpenTofu environment that provisions two disposable
-Proxmox VMs for live acceptance testing of
-`platform-proxmox-vm-snapshot` from `platform-tools`.
+The `environments/snapshot-test` OpenTofu root provisions two disposable VMs
+for live acceptance of `platform-proxmox-vm-snapshot`. It has independent state
+and must never share tfvars or state with another environment root.
 
-Keep the environment definitions for future acceptance runs, but create the
-VMs only while testing and destroy them afterward.
+Keep the public root, private configuration, dedicated guest SSH keys, and
+acceptance evidence for repeatable future runs. Create the VMs only while
+testing and destroy them after every run.
 
-## Current Context
+## Responsibility Split
 
-- The private inventory and local OpenTofu state were reviewed before this
-  handoff was written.
-- Every existing managed VM has an active platform role; none is designated as
-  a disposable snapshot-test target.
-- Reusing an existing VM would expose a real service to disk rollback,
-  configuration rollback, and power-state changes.
-- Existing environment roots now derive both `managed-by-tofu` and their
-  environment name. Redundant public and private dev tags were removed as part
-  of the tag-reconciliation checkpoint; live plans still gate any apply.
-- Real VM names, IDs, addresses, node names, storage names, and template IDs
-  belong in `platform-private` and must not be copied into this public plan.
+`platform-infra` owns:
 
-## Decisions
+- VM existence, virtual hardware, and Proxmox tags
+- minimal cloud-init identity and network intent
+- independent OpenTofu state and outputs
+- reviewed provisioning and destruction
 
-- Use two dedicated VMs rather than any existing platform VM.
-- Add an independent `environments/snapshot-test` root and state.
-- Automatically add `managed-by-tofu` and the root's environment name to every
-  VM managed by an environment root.
-- Give the two VMs a shared `snapshot-test` environment tag so the snapshot
-  tool can exercise serial multi-VM behavior.
-- Keep guest configuration minimal; these VMs do not host platform services
-  and do not need normal `platform-config` service enrollment.
-- Destroy the VMs after acceptance while retaining their OpenTofu and private
-  configuration for later runs.
-- Do not deliberately induce live locks, storage failures, target drift, or
-  partial operations. Those failure paths remain fake-backed tests.
+`platform-tools` owns the snapshot CLI and its live acceptance procedure.
+Temporary guest filesystem preparation and detailed environment-specific
+evidence belong in private operator configuration, not this repository.
 
-## Scope
+Do not enroll these VMs in platform services or reuse an existing service VM
+for rollback testing.
 
-- Add the public `snapshot-test` environment root.
-- Add matching private tfvars and environment-shell configuration.
-- Make environment tags automatic for all roots.
-- Reconcile manually duplicated public and private environment tags. If every
-  VM already has its environment tag, the combined change must not alter the
-  effective tag set; otherwise review and approve only the expected metadata
-  update.
-- Document initialization, state isolation, testing, and destruction.
-- Validate plans for `homelab`, `dev`, and `snapshot-test` independently.
-- Provision and destroy the test VMs only after explicit plan approval.
+## Persistent Assets
 
-## Non-Goals
+Retain these assets between runs:
 
-- Do not configure applications or platform services inside the test VMs.
-- Do not add the VMs to normal Ansible service inventories.
-- Do not modify existing service VMs for snapshot acceptance testing.
-- Do not store API tokens, private keys, state, or plan files in Git.
-- Do not automate live snapshot rollback in CI.
-- Do not add remote state solely for this local acceptance environment.
+- `environments/snapshot-test/`
+- `platform-private/infra/snapshot-test.tfvars`
+- `platform-private/infra/snapshot-test.tofu.env`
+- `platform-private/infra/plans/snapshot-test-acceptance-log.md`
+- dedicated guest cloud-init keypairs outside Git
+
+State, saved plans, private keys, tokens, and real infrastructure values must
+remain outside Git. Remove ignored saved-plan files after every completed run.
 
 ## Public Test Shape
 
-Use neutral public examples. Put real values only in
-`platform-private/infra/snapshot-test.tfvars`.
+The public example remains neutral. Real values belong only in private config.
 
 | Property | Test VM 1 | Test VM 2 |
 | --- | --- | --- |
 | Inventory key | `example-snapshot-test-01` | `example-snapshot-test-02` |
 | Hostname | `example-snapshot-test-01.example.test` | `example-snapshot-test-02.example.test` |
-| VMID | `<unused-test-vmid-1>` | `<unused-test-vmid-2>` |
 | Address | `192.0.2.74/24` | `192.0.2.75/24` |
 | Explicit tags | `rocky`, `disposable` | `rocky`, `disposable` |
 | CPU | 2 cores | 2 cores |
@@ -77,402 +54,192 @@ Use neutral public examples. Put real values only in
 | Boot disk | 20 GiB | 20 GiB |
 | Additional disk | 5 GiB on `scsi1` | 5 GiB on `scsi1` |
 
-The environment root must add `managed-by-tofu` and `snapshot-test`; private
-VM declarations must not need to repeat them.
+The root automatically adds `managed-by-tofu` and `snapshot-test`. The exact
+four-tag set on each live VM must therefore be `disposable`,
+`managed-by-tofu`, `rocky`, and `snapshot-test`.
 
 ## Connection Identities
 
-Live snapshot commands connect to the Proxmox host, not to the guest VMs. A
-sanitized public example is:
-
-```bash
-platform-proxmox-vm-snapshot list \
-  --ssh root@192.0.2.10 \
-  --identity-file ~/.ssh/platform-template-builder_ed25519 \
-  --environment snapshot-test
-```
-
-The SSH client identity accepted by the Proxmox host is operator-owned and is not generated by
-`platform-infra make init-ssh`. That target creates separate guest cloud-init
-keys with the default pattern:
-
-```text
-~/.ssh/platform-infra-<environment>-<vm-key>-cloud-init_ed25519
-```
-
-Guest keys support acceptance checks and later configuration management; the
-snapshot helper does not use them. Proxmox communicates with
-`qemu-guest-agent` through its virtual agent channel rather than SSH.
-
-## Phase 1: Automatic Environment Tags
-
-- [x] Update `environments/homelab/locals.tf` so `default_tags` contains
-      `managed-by-tofu` and `local.environment`.
-- [x] Update `environments/dev/locals.tf` the same way.
-- [x] Use the same rule in `environments/snapshot-test/locals.tf`.
-- [x] Preserve `sort(distinct(var.tags))` in `modules/proxmox-vm/main.tf` so
-      migration-time duplicate tags remain harmless.
-- [x] Remove manually repeated environment tags from public examples and the
-      corresponding private VM declarations in the same reviewed checkpoint.
-- [x] Confirm each existing-root plan's tag effect is either no tag change or
-      the expected in-place environment-tag update; review unrelated actions
-      separately below.
-- [ ] Confirm no existing-root plan contains a VM replacement, deletion, disk,
-      CPU, memory, or network change.
-- [ ] Obtain explicit approval before applying metadata changes to existing
-      VMs.
-
-Use this root-local pattern:
-
-```hcl
-locals {
-  environment  = "snapshot-test"
-  default_tags = ["managed-by-tofu", local.environment]
-}
-```
-
-Treat tag reconciliation as a separate operational checkpoint before creating
-the snapshot-test VMs. Do not apply between adding root-derived tags and
-removing equivalent public/private tags. Review the combined existing-root
-plans first.
-
-## Phase 2: Public Environment Root
-
-Create `environments/snapshot-test/` following the existing environment-root
-structure:
-
-- [x] Add `main.tf` using `../../modules/proxmox-vm` with
-      `for_each = var.vms`.
-- [x] Add `locals.tf` with `environment = "snapshot-test"`, automatic tags,
-      config-root resolution, token-file resolution, and per-VM SSH key paths.
-- [x] Add `variables.tf` with the existing root input contract.
-- [x] Add `outputs.tf` with VM names, IDs, configured addresses, guest-agent
-      addresses, and the inventory handoff map.
-- [x] Add `providers.tf` and `versions.tf` matching the supported OpenTofu and
-      `bpg/proxmox` constraints.
-- [x] Add `terraform.tfvars.example` using only RFC 5737 addresses and neutral
-      identifiers.
-- [x] Add `README.md` describing the root as disposable and state-isolated.
-- [x] Run `tofu init` and include `.terraform.lock.hcl` with the root change.
-- [x] Confirm state, plans, and `.terraform/` remain ignored.
-
-Reuse the existing module. Do not add a second snapshot-specific VM module.
-
-## Phase 3: Private Configuration
-
-In `platform-private/infra/`:
-
-- [x] Add `snapshot-test.tfvars` with the reviewed private endpoint, node,
-      bridge, storage, DNS, gateway, template, VMIDs, and addresses.
-- [x] Add exactly two disposable VM declarations with a small additional disk
-      so live acceptance exercises multi-disk snapshots.
-- [x] Add `snapshot-test.tofu.env` that sets `TF_CLI_ARGS_plan` and
-      `TF_CLI_ARGS_destroy` to the matching tfvars and explicitly unsets
-      `TF_CLI_ARGS_apply`.
-- [x] Require saved-plan apply for this environment. A saved plan already
-      contains its input values, and OpenTofu rejects `-var` or `-var-file`
-      arguments while applying it.
-- [x] Reference the outside-Git token file; do not embed a token.
-- [x] Check candidate VMIDs against live Proxmox before planning.
-- [x] Check candidate addresses against DHCP, DNS, and network inventory before
-      generating the final provisioning plan.
-- [x] Do not commit generated private keys.
-
-Generate dedicated cloud-init SSH keys from the public repository root:
+OpenTofu uses the API token referenced by the private tfvars. The snapshot tool
+connects to the Proxmox host with an operator-controlled SSH client identity.
+Guest verification uses separate cloud-init keys generated by:
 
 ```bash
 make init-ssh ENV=snapshot-test PRIVATE=1
 ```
 
-The expected path pattern is:
+Guest keys are not accepted by the Proxmox host unless configured separately,
+and the snapshot tool does not use them. Proxmox communicates with
+`qemu-guest-agent` through its virtual agent channel rather than guest SSH.
 
-```text
-~/.ssh/platform-infra-snapshot-test-<vm-key>-cloud-init_ed25519
-```
+## Preconditions
 
-## Phase 4: Documentation Integration
+Before provisioning:
 
-- [x] Add this document to `docs/README.md`.
-- [x] Update `README.md` to list the new root and matching private files.
-- [x] Update `docs/workflow.md` with setup, plan, apply, and destroy commands.
-- [x] Update `docs/requirements.md` with private config expectations.
-- [x] Update `docs/state.md` with the new independent-state invariant.
-- [x] Update `docs/troubleshooting.md` with root/tfvars mismatch guidance.
-- [x] Update `docs/ci.md` so secret-free validation includes `snapshot-test`.
-- [x] Update `docs/roadmap.md` with the disposable snapshot acceptance
-      milestone.
-- [x] Update `AGENTS.md` with the lasting snapshot-test ownership and safety
-      rules.
-- [x] Update the current `Unreleased` sections in `NEWS.md` and
-      `CHANGELOG.md`.
+1. Confirm the target is a single-node Proxmox VE 9 installation.
+2. Confirm both private VMIDs are absent from live Proxmox inventory.
+3. Confirm both private addresses are free in authoritative DHCP and network
+   inventory.
+4. Confirm the selected source is a cloneable template.
+5. Confirm the datastore supports snapshots and has capacity for two full
+   clones, two additional disks, and optional saved memory state.
+6. Confirm the Proxmox host provides `bash`, `pvesh`, `jq`, and `qm`.
+7. Confirm the operator workstation provides OpenTofu, `bash`, `ssh`, and
+   `jq`.
+8. Run the current snapshot-tool tests from the exact checkout that will be
+   exercised.
+9. Record revisions and private-input checksums in the private acceptance log.
 
-Documentation must state that snapshots are temporary rollback points, not
-backups, and that environment operations are serial rather than atomic.
+Stop if an identifier is already in use or if the plan includes any existing
+resource.
 
-## Phase 5: Static Verification And Private Plans
+## Provision
 
-Run from the `platform-infra` repository root:
-
-```bash
-make verify ENV=homelab
-make verify ENV=dev
-make verify ENV=snapshot-test
-```
-
-Validation gate:
-
-- [x] OpenTofu formatting passes.
-- [x] All three roots initialize and validate.
-- [x] Existing Make and SSH-key helpers accept `ENV=snapshot-test` without
-      special cases.
-- [x] Public examples contain only documentation addresses and neutral names.
-- [x] No state, plan, token, key, or private value is staged.
-- [x] `git diff --check` passes.
-- [x] Final diffs in both repositories contain no unrelated changes.
-
-`make verify` does not run `tofu plan`. After static checks, run native private
-plans independently from each matching root after sourcing its matching
-`.tofu.env` file. The homelab and dev plans validate the tag-reconciliation
-checkpoint; the snapshot-test plan validates exactly two new VM creates. Never
-cross-use tfvars or state between roots.
-
-Run the publication checks before committing public changes:
+Run setup helpers from the repository root:
 
 ```bash
-git grep -n -E '192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.'
-git grep -n -E 'BEGIN .*PRIVATE KEY|proxmox_api_token\s*=|TOKEN_SECRET|password|secret'
+make deps
+make env ENV=snapshot-test PRIVATE=1
+make init-ssh ENV=snapshot-test PRIVATE=1
+make validate ENV=snapshot-test
 ```
 
-Review every match rather than assuming the search is clean.
-
-## Phase 6: Read-Only Live Preflight
-
-Before applying:
-
-- [x] Confirm the target is a supported single-node Proxmox VE 9 host.
-- [x] Confirm both candidate VMIDs are unused.
-- [x] Confirm both candidate addresses are unused through authoritative DHCP
-      and network inventory.
-- [x] Confirm the selected template exists and can be cloned.
-- [x] Confirm the selected storage supports VM snapshots.
-- [x] Confirm storage has room for two full clones, two additional disks, and
-      saved memory state during testing.
-- [x] Confirm the Proxmox host has `bash`, `pvesh`, and `jq`, plus `qm` for
-      mutations.
-- [x] Confirm an SSH operator workstation has local `bash`, `ssh`, and `jq`.
-- [x] Confirm the run is specifically against a single-node Proxmox VE 9 host;
-      other Proxmox versions and multi-node clusters are outside this
-      acceptance scope.
-- [x] Record only sanitized evidence in the public progress log.
-
-Stop if any candidate identifier is already in use. Do not silently choose new
-private values without updating and reviewing the private configuration.
-
-## Phase 7: Plan And Apply
-
-From `environments/snapshot-test`:
+Create a saved plan from the isolated root:
 
 ```bash
+cd environments/snapshot-test
 source "../../../platform-private/infra/snapshot-test.tofu.env"
-tofu plan -out=snapshot-test.tfplan
+
+~/.local/bin/tofu init
+~/.local/bin/tofu validate
+~/.local/bin/tofu plan -out=snapshot-test.tfplan
+~/.local/bin/tofu show -no-color snapshot-test.tfplan
 ```
 
-Approval gate:
-
-- [x] The plan contains exactly two VM creates.
-- [x] No existing VM is updated, replaced, stopped, or destroyed.
-- [x] Names, VMIDs, disks, addresses, tags, and SSH keys match the reviewed
-      private values.
-- [ ] The user explicitly approves the generated saved plan. Provisioning was
-      authorized conditionally before regeneration, and machine inspection
-      confirmed exactly the two reviewed creates and no other actions, but no
-      separate post-generation approval was recorded.
-
-Apply the saved plan without injecting variable arguments:
+The reviewed plan must contain exactly two creates, no updates or destroys,
+the expected four-tag sets, and the reviewed VM shape. Obtain explicit approval
+of the generated saved-plan artifact, record its checksum, and verify the code,
+inputs, guest public keys, and plan have not changed before applying it:
 
 ```bash
-TF_CLI_ARGS_apply= tofu apply snapshot-test.tfplan
+TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test.tfplan
 ```
 
-Do not replace this with an unsaved `tofu apply`. The empty command-local
-`TF_CLI_ARGS_apply` also protects against arguments left in the shell after a
-different environment file was sourced.
+Do not substitute an unsaved apply. `snapshot-test.tofu.env` intentionally
+unsets `TF_CLI_ARGS_apply` because a saved plan already contains its input
+values.
+
+## Verify Provisioning
+
+After apply, verify all of these conditions through both OpenTofu and direct
+Proxmox queries:
+
+- state contains exactly the two reviewed resources
+- exact VMID and name bindings match private config
+- both VMs are running and unlocked
+- both VMs have exactly the four reviewed tags
+- no unrelated VM has the `snapshot-test` tag
+- boot and additional disks match the reviewed shape
+- guest SSH works with each dedicated key
+- passwordless administrative access and `qemu-guest-agent` are healthy
+- neither VM appears in a platform service inventory
+- a refresh plan reports no drift
+
+## Snapshot Acceptance Handoff
+
+Use the live acceptance runbook owned by `platform-tools` after provisioning:
+
+<https://codeberg.org/rch/platform-tools/src/branch/main/docs/proxmox-vm-snapshot-acceptance.md>
+
+The private acceptance log supplies exact targets, connection identities,
+temporary guest fixture commands, checksums, and unsanitized observations.
+Before every environment mutation, compare the complete resolved target set
+with both reviewed VMs and direct Proxmox inventory.
+
+Snapshots are temporary rollback points, not durable backups. Multi-VM
+operations run serially and are not atomic; a failure can leave earlier targets
+completed and later targets untouched.
+
+Live lock, target-drift, storage-failure, and partial-operation injection remain
+fake-backed tests. Do not deliberately induce those failures on live systems.
+
+## Prepare For Destruction
+
+Before planning destruction:
+
+1. Delete every named test snapshot through the normal snapshot tool path.
+2. Query both VMs directly and confirm each snapshot list contains only
+   Proxmox's synthetic `current` entry.
+3. Confirm exact VM identities, exact four-tag sets, and absent VM locks.
+4. Confirm OpenTofu state contains exactly the two disposable resources.
+5. Preserve detailed evidence and publish only a sanitized result.
+
+Stop if normal snapshot deletion fails. Do not force-delete snapshot metadata
+or manually destroy a VM during the normal workflow.
+
+## Destroy
+
+Create and inspect a fresh saved destroy plan:
+
+```bash
+cd environments/snapshot-test
+source "../../../platform-private/infra/snapshot-test.tofu.env"
+
+~/.local/bin/tofu plan -destroy -out=snapshot-test-destroy.tfplan
+~/.local/bin/tofu show -no-color snapshot-test-destroy.tfplan
+```
+
+The plan must contain exactly two destroys for the two state-managed test VMs,
+with no create, update, replacement, or unrelated resource. Obtain explicit
+approval of the generated saved-plan artifact, record its checksum, and verify
+the code, private inputs, and plan have not changed before applying it:
+
+```bash
+TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test-destroy.tfplan
+```
 
 After apply:
 
-- [x] Both VMs appear in OpenTofu state and Proxmox.
-- [x] Both contain exactly one `managed-by-tofu` tag and exactly one
-      `snapshot-test` tag while retaining the reviewed explicit tags.
-- [x] No unrelated VM has the `snapshot-test` tag.
-- [x] Guest SSH works with each dedicated key.
-- [x] QEMU guest-agent status is healthy.
-- [x] Boot and additional disks are visible.
-- [x] Neither VM belongs to a platform service inventory.
+1. Confirm `tofu state list` is empty.
+2. Confirm both VMIDs are absent from live Proxmox inventory.
+3. Confirm no live VM has the `snapshot-test` tag.
+4. Remove `snapshot-test.tfplan` and `snapshot-test-destroy.tfplan`.
+5. Retain the root, private config, keys, and evidence for future runs.
 
-## Phase 8: Platform-Tools Acceptance Handoff
+## Failure Recovery
 
-The environment is ready when this command returns exactly the two disposable
-VMs:
+If snapshot deletion, rollback, or OpenTofu destruction fails:
 
-```bash
-platform-proxmox-vm-snapshot list \
-  --ssh root@<proxmox-host> \
-  --environment snapshot-test
-```
+1. Stop further mutation and preserve state and command output.
+2. Re-list both targets, snapshots, and Proxmox lock state.
+3. Correct the underlying task or lock failure and retry normal cleanup.
+4. Use a fresh destroy plan only when it still contains exactly the two
+   disposable VMs and receives explicit approval.
+5. If reviewed destruction is blocked, retain the VMs and escalate to a
+   separately authorized break-glass and state-repair procedure.
 
-The `platform-tools` acceptance run should cover:
+Never issue an ad hoc manual VM destroy while OpenTofu still owns the resource.
 
-- [x] VMID selection.
-- [x] Exact-name selection.
-- [x] `snapshot-test` environment selection.
-- [x] Create, list, rollback, and delete.
-- [x] Dry-run and interactive confirmation.
-- [x] Explicit `--yes` after interactive confirmation is proven.
-- [x] Default and explicit descriptions.
-- [x] `--include-memory`.
-- [x] Rollback stopped-state behavior.
-- [x] `--start-after-rollback`.
-- [x] Local read-only and direct-host mutation execution.
-- [x] SSH execution and identity-file handling.
-- [x] Direct structured Proxmox verification after each operation.
+## Validated Behavior
 
-The primary mutation run satisfied these gates immediately before every
-environment create, rollback, or delete. The later incomplete-checkpoint
-negative probes were separately authorized to fail during their own remote
-preflight and did not proceed to mutation:
+The disposable environment completed live acceptance on Proxmox VE 9 in July
+2026. Sanitized observations established:
 
-- [x] Query both VMs directly and confirm each has exact `managed-by-tofu` and
-      `snapshot-test` tags.
-- [x] Run the matching environment dry-run or list operation again.
-- [x] Compare the complete resolved VMID set with the two reviewed private
-      targets and current Proxmox inventory.
-- [x] Abort if either target is missing or any additional target appears.
-- [x] Abort if either required tag is missing or any unrelated VM has the
-      `snapshot-test` tag.
-- [x] Record explicit operator approval for that operation and exact target
-      set.
+- VMID, exact-name, and dual-tag environment selection
+- local and SSH execution paths
+- dry-run and strong confirmation behavior
+- disk-only and saved-memory snapshots
+- stopped and explicit-start rollback behavior
+- observable boot-disk, additional-disk, and memory restoration
+- fail-closed handling of an incomplete environment checkpoint
+- snapshot-name schema handling and rollback polling on the tested host
+- normal snapshot deletion and exact two-resource OpenTofu destruction
 
-Observable rollback acceptance belongs to a private or `platform-tools`-owned
-temporary test fixture, not to this repository. `platform-infra` only attaches
-the additional disk and provides initial access. The owning acceptance runbook
-must produce these observable outcomes without adding partitioning, formatting,
-mounting, or guest marker implementation here:
+Detailed evidence remains private. The initial provisioning and destruction
+runs were authorized conditionally before their final saved plans were
+generated; no separate post-generation artifact approvals were recorded.
+Future runs must obtain approval after reviewing each generated saved plan.
 
-- [x] Before a disk-only snapshot, write distinct baseline markers to the boot
-      disk and the temporarily prepared additional disk, then flush writes.
-- [x] After the snapshot, replace both markers and flush writes again.
-- [x] Roll back without automatic restart, verify Proxmox reports `stopped`,
-      start the guest deliberately, and confirm both baseline markers return.
-- [x] Before a memory snapshot, write a baseline marker in `/dev/shm`, create a
-      saved-memory snapshot, replace the marker, and roll back with
-      `--start-after-rollback`.
-- [x] Confirm the VM reaches `running` and the original `/dev/shm` marker is
-      restored, demonstrating observable saved-memory restoration.
-- [x] Keep temporary disk preparation and marker implementation outside
-      `platform-infra`.
-- [ ] Remove the temporary fixture with the separately approved VM
-      destruction.
-
-Keep live lock, drift, storage-failure, and partial-operation injection out of
-this acceptance run. Existing fake-backed tests cover those unsafe paths.
-
-## Phase 9: Destruction
-
-After every test snapshot has been deleted, run from
-`environments/snapshot-test`:
-
-```bash
-source "../../../platform-private/infra/snapshot-test.tofu.env"
-tofu plan -destroy -out=snapshot-test-destroy.tfplan
-```
-
-Destruction approval gate:
-
-- [ ] The destroy plan contains exactly the two test VMs.
-- [ ] No other resource is present in the destroy plan.
-- [ ] The user explicitly approves the reviewed destroy plan.
-- [ ] Apply the saved destroy plan without variable arguments:
-      `TF_CLI_ARGS_apply= tofu apply snapshot-test-destroy.tfplan`.
-- [ ] Confirm both VMs are absent from Proxmox and OpenTofu state.
-- [ ] Remove ignored plan files.
-- [ ] Retain the public root and private configuration for future runs.
-
-If snapshot deletion, rollback, or lock handling fails:
-
-- [ ] Stop further acceptance operations and preserve OpenTofu state and the
-      sanitized operation record.
-- [ ] Re-list both targets and snapshots and inspect the current Proxmox lock
-      state before attempting cleanup.
-- [ ] Correct the underlying task or lock failure and retry normal deletion
-      without forced metadata-only deletion.
-- [ ] If normal deletion cannot complete, prepare a fresh destroy plan and use
-      it only when it still contains exactly the two disposable VMs and the
-      user explicitly authorizes VM destruction with snapshots present.
-- [ ] If reviewed OpenTofu destruction is also blocked, retain the VMs and
-      escalate to a separately authorized break-glass and state-repair
-      procedure. Do not issue an ad hoc manual VM destroy from this plan.
-
-## Acceptance Criteria
-
-- The test environment has independent state.
-- Existing platform VMs are never snapshot-test targets.
-- Every environment root derives its environment tag declaratively; applying
-  and reconciling broader existing-VM tag changes remains a separate gate.
-- `--environment snapshot-test` resolves exactly two disposable VMs.
-- Existing-root plans contain no unreviewed replacements or destructive
-  changes.
-- The test pair can be recreated and destroyed through normal OpenTofu
-  workflows.
-- Live acceptance covers single-VM and serial multi-VM behavior.
-- No secret or private infrastructure value enters the public repository.
-- Sanitized acceptance evidence is recorded in this document's progress log.
-
-## Risks And Mitigations
-
-| Risk | Mitigation |
-| --- | --- |
-| Candidate VMIDs or addresses are already used live. | Check Proxmox, DHCP, DNS, and network inventory before plan or apply. |
-| Automatic tags cause unexpected existing-VM changes. | Review separate existing-root plans and require approval before metadata apply. |
-| The wrong private tfvars are used from the new root. | Use a dedicated `.tofu.env`, document the invariant, and inspect every plan target. |
-| Test storage usage is larger than expected. | Check free space before apply and memory snapshot creation; destroy the VMs after acceptance. |
-| Multi-VM rollback produces inconsistent guest state. | Use only the disposable pair and treat operations as serial and non-atomic. |
-| Local state is lost before cleanup. | Preserve the environment state until destroy completes; never delete VMs manually during the normal workflow. |
-| Private details leak into the public repository. | Keep real values in `platform-private` and run the publication checklist before commit. |
-
-## Open Questions
-
-- [x] Private VMIDs and addresses were confirmed unused before provisioning.
-- [x] The selected datastore has enough capacity for both test VMs and
-      memory snapshots.
-- [x] Detailed evidence uses the private infrastructure acceptance log under
-      `platform-private/infra/plans/`.
-
-## Progress Log
-
-| Date | Update | Evidence |
-| --- | --- | --- |
-| 2026-07-25 | Reviewed private declarations and local state; all existing VMs have active roles and no disposable target exists. Chose two disposable VMs in an isolated root. | Local `platform-private` inventory and `platform-infra` state review; private identifiers intentionally omitted |
-| 2026-07-25 | Handoff plan added. No OpenTofu files or infrastructure changed. | `docs/proxmox-snapshot-test-environment.md` |
-| 2026-07-25 | Chose a separate existing-root tag reconciliation checkpoint and private detailed acceptance evidence. | User decisions recorded before implementation |
-| 2026-07-25 | Added root-derived environment tags and removed redundant dev tags from public and private declarations. Static validation passed; live plans remain pending. | `environments/{homelab,dev}/locals.tf`, public examples, private `dev.tfvars` |
-| 2026-07-25 | Homelab and dev private plans completed with no create, replace, or destroy actions. Dev has no effective tag change; homelab adds its environment tag. Both plans also contain previously pending discard and IO-thread disk updates, so no tag apply was performed. | Redacted local plan review; private identifiers omitted |
-| 2026-07-25 | Added and initialized the state-isolated public snapshot-test root with two neutral disposable VM examples. | `environments/snapshot-test/`; OpenTofu 1.11.7 validation with provider 0.106.0 |
-| 2026-07-25 | Added private snapshot-test values, environment arguments, acceptance log, and dedicated SSH keys after live collision/tool/storage preflight. | `platform-private/infra/`; generated keys remain outside Git |
-| 2026-07-25 | Created a saved private plan with exactly two VM creates and no other actions. The plan remains unapplied pending explicit approval. | Ignored `environments/snapshot-test/snapshot-test.tfplan`; private details omitted |
-| 2026-07-25 | Public verification and publication scans passed. Candidate addresses had no ping or resolver response, but authoritative DHCP/network confirmation remains pending. | Three-root `make verify`; tracked-content publication scan; sanitized private preflight |
-| 2026-07-25 | After address confirmation and explicit conditional provisioning authorization, regenerated, machine-validated, and applied an exact two-create saved plan. No separate post-generation approval was recorded. Both disposable VMs are running with the reviewed identities, tags, disks, SSH access, and healthy guest agents; a post-apply plan reports no drift. No disk formatting or snapshot mutation was performed. | OpenTofu state and refresh plan; direct Proxmox and guest verification; private acceptance log |
-| 2026-07-25 | Completed authorized disk and saved-memory snapshot acceptance on the isolated disposable pair. Corrected temporary fixture filesystem labeling before successful freeze/thaw verification, then verified all selectors, confirmations, dry-runs, serial environment operations, stopped and explicit-start rollback, restored guest markers, and normal snapshot deletion. | Sanitized direct Proxmox and guest observations; detailed private run `20260725T211040Z` |
-| 2026-07-25 | Confirmed direct-host mutation and fail-closed handling of an incomplete environment checkpoint. Both environment rollback and deletion stopped in preflight before mutation; the isolated snapshot was then deleted normally. Both VMs remain running without named snapshots or OpenTofu drift pending separate destroy approval. | Sanitized direct Proxmox, guest, storage, and OpenTofu observations; detailed private run `20260725T224300Z` |
-| 2026-07-26 | Validated snapshot-name rules against the installed Proxmox schema and confirmed SSH rollback with explicit restart completed inside the tool's operational polling bound on the tested host. Deleted the timing snapshot normally; both VMs remained running with no named snapshots. | Sanitized installed-schema, direct Proxmox, and timed CLI observations; detailed private timing run |
-| 2026-07-26 | Rechecked both existing roots without applying changes. The `dev` selector exactly matched its complete state-managed set and its plan had no tag changes, while `homelab` selected no eligible VMs and its plan still combines the missing environment tag with disk-setting changes. The broader release gate remains blocked. | Fresh read-only detailed-exitcode plans and exact state-to-selector comparisons; private identifiers omitted |
-
-## Decision Log
-
-| Date | Decision | Reason |
-| --- | --- | --- |
-| 2026-07-25 | Use two dedicated disposable VMs. | One VM cannot exercise real serial environment behavior; existing VMs host active services. |
-| 2026-07-25 | Use an independent `snapshot-test` root. | Separate state prevents acceptance resources from sharing the active dev state. |
-| 2026-07-25 | Destroy test VMs after each acceptance run but retain definitions. | This preserves repeatability without permanent compute and storage cost. |
-| 2026-07-25 | Keep real target values in `platform-private`. | The public repository policy forbids publishing private infrastructure identifiers. |
-| 2026-07-25 | Keep broader existing-root tag reconciliation as a general release gate separate from isolated `snapshot-test` acceptance. | The isolated root proves the tool against exact disposable targets without claiming that pending existing-environment metadata changes were applied. |
-| 2026-07-25 | Keep detailed live acceptance evidence private. | VM identities and environment details must not enter the public repository. |
+This isolated acceptance does not authorize snapshot mutation in `homelab`,
+`dev`, or another environment. Each broader environment still requires complete
+tag reconciliation, exact target-set review, and separate approval.
