@@ -49,7 +49,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
 - For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root. Homelab and dev set plan, apply, and destroy arguments; snapshot-test intentionally unsets apply arguments and requires saved-plan apply.
 - Never cross-use tfvars or state between environment roots.
-- `snapshot-test` owns two disposable VMs for manual `platform-proxmox-vm-snapshot` acceptance. Do not add services or guest disk preparation here, and do not apply, mutate snapshots, or destroy without the explicit gates in `docs/proxmox-snapshot-test-environment.md`.
+- `snapshot-test` owns two disposable VMs for manual `platform-proxmox-vm-snapshot` acceptance. Do not add services or guest disk preparation here. Use `docs/proxmox-snapshot-test-environment.md` for VM lifecycle gates and the tool-owned live-acceptance runbook for snapshot mutation gates.
 - Normal Make command order:
 
 ```bash

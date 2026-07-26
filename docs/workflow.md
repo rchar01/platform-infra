@@ -290,29 +290,12 @@ make init-ssh ENV=snapshot-test PRIVATE=1
 make validate ENV=snapshot-test
 ```
 
-Run OpenTofu from the disposable root and create a saved plan:
-
-```bash
-cd environments/snapshot-test
-source "../../../platform-private/infra/snapshot-test.tofu.env"
-
-~/.local/bin/tofu init
-~/.local/bin/tofu validate
-~/.local/bin/tofu plan -out=snapshot-test.tfplan
-```
-
-Apply only after confirming the saved plan creates exactly the two reviewed
-disposable VMs and changes no existing resource:
-
-```bash
-TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test.tfplan
-```
-
-The environment file intentionally leaves apply arguments unset because saved
-plans already contain their input values. Follow
-`proxmox-snapshot-test-environment.md` for live preflight, snapshot operations,
-private evidence, and reviewed destruction. Do not enroll these VMs in normal
-platform services.
+The specialized
+[`proxmox-snapshot-test-environment.md`](./proxmox-snapshot-test-environment.md)
+runbook is authoritative for preflight, saved-plan approval, provisioning,
+verification, and destruction. Do not use the general apply or destroy examples
+below for this stricter root. Snapshot operations follow the tool-owned live
+acceptance runbook; do not enroll the disposable VMs in platform services.
 
 ## Switching Environments
 
@@ -375,20 +358,10 @@ rm -f destroy.tfplan
 ~/.local/bin/tofu state list
 ```
 
-Use `environments/dev` and `dev.tofu.env` for dev destroys. Snapshot-test has a
-stricter saved destroy-plan workflow in
-`proxmox-snapshot-test-environment.md`; use it only after deleting test
-snapshots and obtaining explicit approval:
-
-```bash
-cd environments/snapshot-test
-source "../../../platform-private/infra/snapshot-test.tofu.env"
-~/.local/bin/tofu plan -destroy -out=snapshot-test-destroy.tfplan
-TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test-destroy.tfplan
-```
-
-The reviewed destroy plan must contain exactly the two disposable VMs and no
-other resource.
+Use `environments/dev` and `dev.tofu.env` for dev destroys. Snapshot-test uses
+the stricter saved-plan destruction procedure in
+[`proxmox-snapshot-test-environment.md`](./proxmox-snapshot-test-environment.md),
+only after normal snapshot cleanup and explicit review.
 
 Prefer this over deleting VMs manually in Proxmox. Manual deletion leaves OpenTofu state stale and requires state repair.
 

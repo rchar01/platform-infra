@@ -33,7 +33,8 @@ Retain these assets between runs:
 - `environments/snapshot-test/`
 - `platform-private/infra/snapshot-test.tfvars`
 - `platform-private/infra/snapshot-test.tofu.env`
-- `platform-private/infra/plans/snapshot-test-acceptance-log.md`
+- `platform-private/infra/snapshot-test/operator-overlay.md`
+- `platform-private/infra/snapshot-test/evidence/`
 - dedicated guest cloud-init keypairs outside Git
 
 State, saved plans, private keys, tokens, and real infrastructure values must
@@ -86,9 +87,8 @@ Before provisioning:
 6. Confirm the Proxmox host provides `bash`, `pvesh`, `jq`, and `qm`.
 7. Confirm the operator workstation provides OpenTofu, `bash`, `ssh`, and
    `jq`.
-8. Run the current snapshot-tool tests from the exact checkout that will be
-   exercised.
-9. Record revisions and private-input checksums in the private acceptance log.
+8. Confirm the tool-owned live-acceptance prerequisites are satisfied.
+9. Record revisions and private-input checksums in the dated private evidence.
 
 Stop if an identifier is already in use or if the plan includes any existing
 resource.
@@ -145,16 +145,17 @@ Proxmox queries:
 - neither VM appears in a platform service inventory
 - a refresh plan reports no drift
 
-## Snapshot Acceptance Handoff
+## Run Live Acceptance
 
-Use the live acceptance runbook owned by `platform-tools` after provisioning:
+Provisioning is complete when the conditions under `Verify Provisioning` pass.
+Then use the live acceptance runbook owned by `platform-tools`:
 
 <https://codeberg.org/rch/platform-tools/src/branch/main/docs/proxmox-vm-snapshot-acceptance.md>
 
-The private acceptance log supplies exact targets, connection identities,
-temporary guest fixture commands, checksums, and unsanitized observations.
-Before every environment mutation, compare the complete resolved target set
-with both reviewed VMs and direct Proxmox inventory.
+The private operator overlay supplies exact targets, connection identities, and
+temporary guest-fixture bindings. Dated private evidence records revisions,
+checksums, approvals, and unsanitized observations. The tool-owned runbook is
+the canonical acceptance procedure.
 
 Snapshots are temporary rollback points, not durable backups. Multi-VM
 operations run serially and are not atomic; a failure can leave earlier targets
@@ -220,26 +221,15 @@ If snapshot deletion, rollback, or OpenTofu destruction fails:
 
 Never issue an ad hoc manual VM destroy while OpenTofu still owns the resource.
 
-## Validated Behavior
+## Validation Status
 
-The disposable environment completed live acceptance on Proxmox VE 9 in July
-2026. Sanitized observations established:
+The complete lifecycle was exercised successfully on Proxmox VE 9 in July
+2026, including technically validated provisioning and destruction through
+this isolated state root. The first run used conditional authorization before
+the final saved plans were generated rather than separate post-generation
+artifact approvals. Detailed results remain in the dated private evidence;
+future runs must follow the current approval sequence in this document.
 
-- VMID, exact-name, and dual-tag environment selection
-- local and SSH execution paths
-- dry-run and strong confirmation behavior
-- disk-only and saved-memory snapshots
-- stopped and explicit-start rollback behavior
-- observable boot-disk, additional-disk, and memory restoration
-- fail-closed handling of an incomplete environment checkpoint
-- snapshot-name schema handling and rollback polling on the tested host
-- normal snapshot deletion and exact two-resource OpenTofu destruction
-
-Detailed evidence remains private. The initial provisioning and destruction
-runs were authorized conditionally before their final saved plans were
-generated; no separate post-generation artifact approvals were recorded.
-Future runs must obtain approval after reviewing each generated saved plan.
-
-This isolated acceptance does not authorize snapshot mutation in `homelab`,
-`dev`, or another environment. Each broader environment still requires complete
-tag reconciliation, exact target-set review, and separate approval.
+This isolated validation does not authorize snapshot mutation in `homelab`,
+`dev`, or another environment. Each broader environment requires complete tag
+reconciliation, exact target-set review, and separate approval.

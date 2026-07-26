@@ -4,7 +4,10 @@ This directory documents how `platform-infra` fits into the platform workspace a
 
 ## Start Here
 
-Read `workflow.md` first. It is the canonical step-by-step guide for infra initialization, local private setup, environment operations for the included `homelab`, `dev`, and disposable `snapshot-test` roots, validation-only checks, fallback testing, destroy, and CI workflow shape.
+Read `workflow.md` first. It is the canonical guide for common initialization,
+private setup, environment selection, validation, destroy, and CI workflow
+shape. The snapshot-test lifecycle document is authoritative where its stricter
+saved-plan and acceptance gates differ from the common workflow.
 
 Then use the supporting docs as references.
 

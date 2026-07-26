@@ -30,4 +30,4 @@ editing the private tfvars. It generates one dedicated keypair per disposable
 VM under `~/.ssh`.
 
 See `../../docs/proxmox-snapshot-test-environment.md` for approval gates,
-acceptance handoff, and destruction requirements.
+lifecycle entry and exit conditions, and destruction requirements.

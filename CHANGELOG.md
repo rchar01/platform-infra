@@ -16,7 +16,7 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- Replaced the completed snapshot-test implementation checklist with a reusable provisioning, verification, handoff, destruction, and recovery runbook.
+- Replaced the completed snapshot-test implementation checklist with a reusable provisioning, verification, live-acceptance entry, destruction, and recovery runbook.
 - Environment roots now add `managed-by-tofu` and their environment name automatically; per-VM tags are role-specific.
 - Clarified the infra initialization workflow, including `make deps` OpenTofu version and install-directory overrides.
 - Kept QEMU guest agent fstrim integration disabled by default and documented when to enable it deliberately.

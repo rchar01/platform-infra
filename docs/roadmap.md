@@ -19,17 +19,14 @@ Acceptance targets:
 - `homelab.tfvars` is used only from `environments/homelab`
 - `dev.tfvars` is used only from `environments/dev`
 
-Validate the on-demand Proxmox development snapshot helper against two
-disposable VMs in an independent `snapshot-test` root.
+## Completed Milestones
 
-Acceptance targets:
-
-- Automatic ownership and environment tags select exactly the disposable pair.
-- Existing service VMs are never snapshot-test targets.
-- Create, list, rollback, and delete work for exact VM and environment selection.
-- Multi-VM operations are treated as serial and non-atomic.
-- The disposable pair is destroyed through its reviewed OpenTofu state after acceptance.
-- Detailed private evidence stays outside this public repository.
+The on-demand Proxmox development snapshot helper completed live validation
+against two disposable VMs in the independent `snapshot-test` root. The
+maintained lifecycle is documented in
+[`proxmox-snapshot-test-environment.md`](./proxmox-snapshot-test-environment.md);
+detailed evidence remains private. This marks technical acceptance complete;
+future runs still require the current post-generation saved-plan approvals.
 
 ## Deferred Work
 

@@ -153,6 +153,9 @@ The normal operator workflow uses a sibling private repository for environment v
   homelab.tofu.env
   dev.tofu.env
   snapshot-test.tofu.env
+  snapshot-test/
+    operator-overlay.md
+    evidence/
 ```
 
 Secrets and key material stay outside Git:
