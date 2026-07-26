@@ -206,6 +206,13 @@ The `.tofu.env` files contain no secrets. Homelab and dev set `TF_CLI_ARGS_plan`
 
 OpenTofu reads the matching `.pub` file for each VM during planning and injects it through cloud-init. The private key path is exposed in `ansible_inventory_map` for `platform-config` handoff.
 
+These generated keys authenticate to guest VMs; they are not Proxmox host
+keys. `platform-proxmox-vm-snapshot --identity-file` instead requires an SSH
+identity accepted by the Proxmox host, such as the public example convention
+`~/.ssh/platform-template-builder_ed25519`. `platform-infra` does not generate
+that host identity through `make init-ssh`; create or select it separately with
+`platform-ssh-init`, `ssh-agent`, or SSH configuration.
+
 ## Homelab Workflow
 
 Run setup helpers from the repository root:

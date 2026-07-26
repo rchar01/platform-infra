@@ -9,6 +9,11 @@ cloud-init access, and handoff outputs. Snapshot operations belong to
 `platform-tools`; temporary guest disk preparation belongs to the private or
 tool-owned acceptance fixture.
 
+`make init-ssh ENV=snapshot-test PRIVATE=1` generates per-VM guest cloud-init
+keys. Those keys are not used by `platform-proxmox-vm-snapshot`; the snapshot
+helper's `--identity-file` must select a separate SSH key accepted by the
+Proxmox host.
+
 ## Private Config
 
 The normal private workflow uses:
