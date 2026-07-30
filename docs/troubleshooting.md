@@ -119,19 +119,18 @@ Confirm the token file exists, contains only the token value, and is readable on
 stat -c '%a %n' ~/.config/platform-infrastructure ~/.config/platform-infrastructure/infra ~/.config/platform-infrastructure/infra/proxmox.token
 ```
 
-Verify the token against the Proxmox API from the operator workstation:
-
-The `-k` flag below is for authentication diagnostics against an untrusted certificate only; it is not the default OpenTofu TLS posture.
+After following [Trust the Proxmox API Certificate](workflow.md#trust-the-proxmox-api-certificate), verify the token against the Proxmox API from the operator workstation. Do not send the token with `-k` or otherwise disable TLS verification:
 
 ```bash
-curl -kfsS \
-  -H "Authorization: PVEAPIToken=$(< ~/.config/platform-infrastructure/infra/proxmox.token)" \
-  https://<proxmox-ip>:8006/api2/json/version
+curl -fsS \
+  -H @<(printf 'Authorization: PVEAPIToken=%s\n' \
+    "$(< ~/.config/platform-infrastructure/infra/proxmox.token)") \
+  https://<proxmox-host>:8006/api2/json/version
 ```
 
 If this returns version data, the token authenticates. If it returns `401 Unauthorized`, recreate the Proxmox token and overwrite the local token file intentionally because Proxmox cannot reveal an existing token secret. If the connection fails before authentication, check the endpoint, port `8006`, routing, firewall, and TLS behavior.
 
-If OpenTofu fails with a certificate verification error, fix local trust for the Proxmox API certificate first. The examples intentionally use `proxmox_insecure = false`. Use `proxmox_insecure = true` only as an explicit private/local override after accepting that a MITM-capable network path could expose or alter token-authenticated API traffic.
+If OpenTofu fails with a certificate verification error, follow [Trust the Proxmox API Certificate](workflow.md#trust-the-proxmox-api-certificate) first. The examples intentionally use `proxmox_insecure = false`. Use `proxmox_insecure = true` only as an explicit private/local override after accepting that a MITM-capable network path could expose or alter token-authenticated API traffic.
 
 If using `proxmox_api_token_file`, remember that relative paths are resolved from the `config_root` value passed to `tofu plan` or `tofu apply`. In the private sourced workflow, `config_root` comes from the matching `*.tofu.env` file.
 

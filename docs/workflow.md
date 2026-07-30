@@ -184,6 +184,56 @@ proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"
 
 The scaffolded examples use `proxmox_insecure = false` so Proxmox API TLS verification is enabled by default. Prefer trusting the Proxmox API certificate from the operator workstation and CI runners. Use `proxmox_insecure = true` only as an explicit private/local override for a known self-signed setup after accepting the MITM and token exposure risk.
 
+### Trust the Proxmox API Certificate
+
+Proxmox stores the cluster CA certificate at `/etc/pve/pve-root-ca.pem`. The
+certificate is public trust material, not a private key, but it is specific to
+the environment and should remain outside Git. Proxmox does not expose this file
+through its API or web interface, so retrieve it through a trusted,
+authenticated channel such as SSH or the node console.
+
+For example, copy it over SSH into the existing local infrastructure config
+directory:
+
+```bash
+install -d -m 0700 ~/.config/platform-infrastructure/infra
+scp <proxmox-user>@<proxmox-host>:/etc/pve/pve-root-ca.pem \
+  ~/.config/platform-infrastructure/infra/proxmox-ca.pem
+chmod 0600 ~/.config/platform-infrastructure/infra/proxmox-ca.pem
+```
+
+Use the least-privileged account that can read the CA file. Some Proxmox hosts
+restrict it to privileged accounts, in which case follow the host's approved
+administrative access policy rather than broadening its permissions.
+
+Verify the SSH host key through a trusted source before accepting it, especially
+on the first connection. Inspect the copied certificate and test it against the
+API endpoint before installing it into the workstation or CI runner trust store:
+
+```bash
+openssl x509 \
+  -in ~/.config/platform-infrastructure/infra/proxmox-ca.pem \
+  -noout -subject -issuer -fingerprint -sha256
+curl --cacert ~/.config/platform-infrastructure/infra/proxmox-ca.pem \
+  --fail --silent --show-error --output /dev/null \
+  https://<proxmox-host>:8006/
+```
+
+The endpoint hostname or IP must also appear in the Proxmox API certificate.
+Install the verified CA using the operating system's trust-store procedure; for
+example, on Debian or Ubuntu:
+
+```bash
+sudo install -m 0644 \
+  ~/.config/platform-infrastructure/infra/proxmox-ca.pem \
+  /usr/local/share/ca-certificates/proxmox-ca.crt
+sudo update-ca-certificates
+```
+
+Keep `proxmox_insecure = false` after trust is established. CI runners need the
+same CA trust setup through their secret or runner provisioning workflow; do not
+commit the environment-specific CA to this public repository.
+
 Expected private layout:
 
 ```text
