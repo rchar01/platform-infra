@@ -9,6 +9,21 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 No unreleased changes.
 
+## [1.5.0] - 2026-07-31
+
+### Added
+
+- Added a workstation workflow for retrieving the Proxmox cluster CA through an authenticated channel, inspecting its identity, and validating the API endpoint before token use.
+- Added scoped non-macOS Unix, system trust, and macOS keychain guidance for keeping Proxmox API TLS verification enabled.
+- Added GitLab CI guidance for protected environment-scoped CA file variables and temporary combined CA bundles.
+- Added private service-address reservation guidance with public OpenBao and monitoring VIP placeholders.
+
+### Changed
+
+- Updated token troubleshooting to authenticate only after trusted TLS is established and to support scoped CA files or inherited system trust.
+- Clarified that real service addresses belong in private network inventory or lifecycle records and must not also be assigned through VM cloud-init.
+- Clarified that VIP interfaces, failover, DNS records, and service configuration remain downstream configuration responsibilities.
+
 ## [1.4.0] - 2026-07-26
 
 ### Added

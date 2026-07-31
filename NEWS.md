@@ -6,6 +6,20 @@ This file gives a short, release-oriented view of what changed between versions.
 
 No unreleased changes.
 
+## v1.5.0 - 2026-07-31
+
+Trusted Proxmox TLS workflows and private service-address reservations.
+
+Highlights:
+
+- Added a trusted workflow for retrieving, inspecting, and validating the Proxmox cluster CA before authenticated API use.
+- Documented scoped non-macOS Unix trust through environment-specific CA files, system trust alternatives, and macOS keychain requirements.
+- Added GitLab guidance for protected, environment-scoped CA file variables and temporary bundles that preserve normal public CA trust.
+- Updated Proxmox token diagnostics to keep TLS verification enabled with either scoped CA files or system trust.
+- Added service-address reservation guidance using public placeholders while keeping real addresses in private network inventory or lifecycle records.
+- Clarified that reserved VIPs remain separate from VM cloud-init addresses and that VIP interfaces, failover, DNS, and services belong to downstream configuration workflows.
+- This release changes operator documentation only; OpenTofu inputs, provider constraints, and VM defaults are unchanged.
+
 ## v1.4.0 - 2026-07-26
 
 VM disk controls, environment ownership tags, and disposable snapshot acceptance infrastructure.
