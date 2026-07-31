@@ -22,7 +22,60 @@ Plan jobs that contact Proxmox should run one environment at a time. Each job mu
 
 CI Proxmox plan jobs should keep TLS verification enabled. Do not set `proxmox_insecure = true` in CI unless the runner network path and certificate trust model have been explicitly reviewed.
 
-Example homelab plan job body:
+### GitLab Proxmox CA Trust
+
+For GitLab jobs, store the Proxmox CA PEM as a protected, environment-scoped
+file-type CI/CD variable named `PROXMOX_CA_FILE`. GitLab exposes a file-type
+variable as the path to a temporary file, so do not treat its value as the PEM
+content. The certificate is not a secret, but it identifies private
+infrastructure and should not be committed to this public repository.
+
+Keep `TF_VAR_proxmox_api_token` protected, masked, and scoped to the same
+environment. Do not use the token until CA validation and the unauthenticated
+TLS check pass. Disable GitLab variable-reference expansion for the token and CA
+variables because neither value should interpolate another CI/CD variable.
+
+Each job using environment-scoped variables must declare the matching GitLab
+environment. Without this job metadata, GitLab does not expose those variables:
+
+```yaml
+<job-name>:
+  environment:
+    name: <environment-name>
+```
+
+For example, variables scoped to `production` require `name: production` on
+both the plan and apply jobs. The shell examples below are job bodies and omit
+this surrounding GitLab YAML.
+
+Create a temporary combined bundle before `make deps` or any OpenTofu command so
+the job trusts both normal public CAs and the Proxmox CA:
+
+```bash
+test -s "$PROXMOX_CA_FILE"
+openssl x509 -in "$PROXMOX_CA_FILE" -noout -checkend 86400
+
+system_ca_bundle="${SYSTEM_CA_BUNDLE:-/etc/ssl/certs/ca-certificates.crt}"
+test -r "$system_ca_bundle"
+
+job_ca_bundle="$(mktemp)"
+trap 'rm -f "$job_ca_bundle"' EXIT
+chmod 0600 "$job_ca_bundle"
+cat "$system_ca_bundle" "$PROXMOX_CA_FILE" >"$job_ca_bundle"
+export SSL_CERT_FILE="$job_ca_bundle"
+
+curl --cacert "$SSL_CERT_FILE" \
+  --fail --silent --show-error --output /dev/null \
+  https://<proxmox-host>:8006/
+```
+
+The default `SYSTEM_CA_BUNDLE` path above is used by Debian, Ubuntu, and Alpine
+images. Override it for a pinned runner image that stores its public CA bundle
+elsewhere. Do not print or persist the combined bundle, and do not include it in
+artifacts. Repeat this setup in an apply job because each GitLab job has a new
+filesystem and process environment.
+
+After establishing GitLab CA trust, an example homelab plan job body is:
 
 ```bash
 make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"
@@ -34,7 +87,7 @@ cd environments/homelab
   -var="config_root=$PWD/../../../platform-private/infra"
 ```
 
-Example dev plan job body:
+An example dev plan job body is:
 
 ```bash
 make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"

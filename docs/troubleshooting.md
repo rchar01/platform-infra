@@ -122,7 +122,12 @@ stat -c '%a %n' ~/.config/platform-infrastructure ~/.config/platform-infrastruct
 After following [Trust the Proxmox API Certificate](workflow.md#trust-the-proxmox-api-certificate), verify the token against the Proxmox API from the operator workstation. Do not send the token with `-k` or otherwise disable TLS verification:
 
 ```bash
-curl -fsS \
+curl_tls_args=()
+if [[ -n "${PROXMOX_CA_FILE:-}" ]]; then
+  curl_tls_args+=(--cacert "$PROXMOX_CA_FILE")
+fi
+
+curl -fsS "${curl_tls_args[@]}" \
   -H @<(printf 'Authorization: PVEAPIToken=%s\n' \
     "$(< ~/.config/platform-infrastructure/infra/proxmox.token)") \
   https://<proxmox-host>:8006/api2/json/version

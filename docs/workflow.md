@@ -219,9 +219,31 @@ curl --cacert ~/.config/platform-infrastructure/infra/proxmox-ca.pem \
   https://<proxmox-host>:8006/
 ```
 
-The endpoint hostname or IP must also appear in the Proxmox API certificate.
-Install the verified CA using the operating system's trust-store procedure; for
-example, on Debian or Ubuntu:
+The endpoint hostname or IP must also appear in the Proxmox API certificate. To
+scope the CA to the private OpenTofu workflow instead of changing system trust,
+add these exports to the matching private `*.tofu.env` file:
+
+```bash
+export PROXMOX_CA_FILE="$HOME/.config/platform-infrastructure/infra/proxmox-ca.pem"
+export SSL_CERT_FILE="$PROXMOX_CA_FILE"
+```
+
+`PROXMOX_CA_FILE` is the environment-specific input path. Assign it explicitly
+in each environment file so switching environments cannot retain another
+environment's CA. On supported non-macOS Unix systems, `SSL_CERT_FILE` is a Go
+trust setting inherited by OpenTofu and the `bpg/proxmox` provider. Source the
+private environment file before `tofu init`, `plan`, or `apply`, and keep
+`proxmox_insecure = false`.
+
+On Unix systems other than macOS, setting `SSL_CERT_FILE` changes the default CA
+bundle file considered by Go processes. Default certificate directories are
+still considered, but CI images and other runtimes can differ. Use the combined
+bundle described in [CI/CD](ci.md#gitlab-proxmox-ca-trust) when the same process
+also needs reliable public CA trust. On macOS, install the verified CA in the
+applicable system or login keychain instead of relying on `SSL_CERT_FILE`.
+
+Alternatively, install the verified CA using the operating system's trust-store
+procedure. For example, on Debian or Ubuntu:
 
 ```bash
 sudo install -m 0644 \
@@ -230,9 +252,8 @@ sudo install -m 0644 \
 sudo update-ca-certificates
 ```
 
-Keep `proxmox_insecure = false` after trust is established. CI runners need the
-same CA trust setup through their secret or runner provisioning workflow; do not
-commit the environment-specific CA to this public repository.
+System trust does not require `SSL_CERT_FILE`. Do not commit the
+environment-specific CA to this public repository with either approach.
 
 Expected private layout:
 
@@ -534,6 +555,28 @@ The first structured handoff output is:
 ```
 
 When DHCP is used, actual leased IP outputs require a working `qemu-guest-agent` in the template.
+
+## Reserve Service Addresses
+
+Reserve service addresses before handing provisioned VMs to `platform-config`.
+Record reservations by purpose in the environment's private network inventory or
+lifecycle record, for example:
+
+| Reservation | Environment-specific address |
+| --- | --- |
+| OpenBao service VIP | `<openbao-vip>` |
+| Monitoring service VIP | `<monitoring-vip>` |
+
+Do not publish private environment addresses in this repository. If the network
+uses DHCP, keep reserved addresses outside its dynamic pool or add authoritative
+reservations. If the network has no DHCP service, record that fact with the
+address reservation. In either case, check the authoritative network inventory,
+DNS, and live address use before approving the addresses.
+
+Reserved service addresses must not also appear as VM cloud-init addresses.
+`platform-infra` documents the reservation and provisions node addresses; actual
+VIP interfaces, failover, DNS records, and service configuration belong in
+`platform-config` or the environment's network-management workflow.
 
 ## Boundary
 
