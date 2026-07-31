@@ -7,6 +7,10 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [1.5.1] - 2026-07-31
+
 ### Changed
 
 - Expanded the fictional dev OpenTofu example from nine to seventeen VMs, with

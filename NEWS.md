@@ -4,6 +4,10 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
+No unreleased changes.
+
+## v1.5.1 - 2026-07-31
+
 Development example topology expansion.
 
 Highlights:
