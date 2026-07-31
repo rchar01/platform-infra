@@ -4,7 +4,17 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-No unreleased changes.
+Development example topology expansion.
+
+Highlights:
+
+- Expanded the fictional dev environment from nine to seventeen VMs.
+- Added three OpenBao VM and three monitoring VM examples and complete
+  three-server, three-worker Kubernetes coverage.
+- Updated fictional VM identities and RFC 5737 addresses so the example forms
+  one coherent environment.
+- The illustrated OpenBao and monitoring resources are experimental development
+  values, not an HA-capacity qualification.
 
 ## v1.5.0 - 2026-07-31
 

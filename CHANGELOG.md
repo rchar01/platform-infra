@@ -7,7 +7,14 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-No unreleased changes.
+### Changed
+
+- Expanded the fictional dev OpenTofu example from nine to seventeen VMs, with
+  complete retained platform roles plus three OpenBao and three monitoring
+  nodes.
+- Replaced the old singleton Vault and Kubernetes-monitoring examples with
+  purpose-specific OpenBao and monitoring nodes.
+- Updated fictional VM IDs and RFC 5737 addresses into one coherent sequence.
 
 ## [1.5.0] - 2026-07-31
 
