@@ -19,6 +19,7 @@ Then use the supporting docs as references.
 | Understand local state, lock files, and remote-state requirements | `state.md` |
 | Design CI validation, plan, and apply jobs | `ci.md` |
 | Choose VM names and VM IDs | `naming-conventions.md` |
+| Verify provisioned VMs manually | `vm-manual-checks.md` |
 | Operate the disposable snapshot acceptance environment | `proxmox-snapshot-test-environment.md` |
 | Check public examples before publishing | `publication-checklist.md` |
 | Debug provisioning failures | `troubleshooting.md` |

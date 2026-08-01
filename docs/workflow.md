@@ -321,6 +321,10 @@ Inspect outputs for handoff to `platform-config`:
 
 The `ansible_inventory_map` output includes `ansible_host`, `ansible_user`, and `ansible_ssh_private_key_file` values for each VM.
 
+After apply, use [Manual VM Verification](vm-manual-checks.md) to check the live
+VM shape, initial SSH access, network intent, disk visibility, and guest-agent
+reporting before handoff to `platform-config`.
+
 ## Dev Workflow
 
 Run setup helpers from the repository root:

@@ -32,6 +32,7 @@ Useful entry points:
 
 - `docs/workflow.md`: canonical runbook for all workflows.
 - `docs/requirements.md`: local, Proxmox, template, and CI prerequisites.
+- `docs/vm-manual-checks.md`: post-apply VM and SSH verification runbook.
 - `docs/proxmox-api-token.md`: token creation and storage guidance.
 - `docs/publication-checklist.md`: public example and artifact review checklist.
 - `docs/state.md`: state isolation and remote-state requirements.
