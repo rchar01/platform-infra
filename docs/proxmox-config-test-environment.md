@@ -31,6 +31,9 @@ storage inventories.
 | Data retention | None |
 | Recovery | Destroy and recreate |
 
+Proxmox cloud-init package upgrades are disabled. The guest must retain the
+template's Rocky Linux 10.1 release through first boot.
+
 The root automatically adds `managed-by-tofu` and `config-test`; the VM adds
 `rocky` and `disposable`. Disk defaults use `virtio-scsi-single`, IO threads,
 discard `on`, cache `none`, and raw format.

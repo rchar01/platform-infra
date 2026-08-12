@@ -122,7 +122,7 @@ Out of scope:
 - Certificate authority generation.
 - Ansible roles or playbooks.
 
-Cloud-init is intentionally minimal here. This repo may set hostname, initial user, SSH key, IP addressing, and DNS intent. Do not use cloud-init in this repo for complex OS configuration.
+Cloud-init is intentionally minimal here. This repo may set hostname, initial user, SSH key, IP addressing, and DNS intent. Automatic first-boot package upgrades are explicitly disabled so image versions remain stable until `platform-config` owns an approved package lifecycle. Do not use cloud-init in this repo for complex OS configuration.
 
 ## Proxmox Disk Performance
 

@@ -46,6 +46,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Proxmox tokens for local operator runs normally live in `~/.config/platform-infrastructure/infra/proxmox.token` with `0600` permissions and are referenced by `proxmox_api_token_file`; do not store token values in `platform-private`.
 - Proxmox API user/token bootstrap belongs in `platform-tools` (`platform-proxmox-token-init`), not in this repo. This repo consumes an existing token.
 - Per-VM cloud-init SSH keys are generated under `~/.ssh` by `platform-ssh-init`; private Git stores only non-secret config and references.
+- The VM module sets `initialization.upgrade = false`; do not allow Proxmox cloud-init to upgrade packages on first boot because package lifecycle belongs in `platform-config`.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
 - For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root. Homelab and dev set plan, apply, and destroy arguments; config-test and snapshot-test intentionally unset apply arguments and require saved-plan apply.
 - Never cross-use tfvars or state between environment roots.

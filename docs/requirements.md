@@ -64,6 +64,10 @@ The maintained OpenTofu roots are independent:
 
 Use native OpenTofu for `plan`, `apply`, and `destroy` from the selected environment root. Use Make targets from the repository root for setup, formatting, and validation helpers.
 
+Proxmox cloud-init automatic package upgrades remain disabled. Templates must
+already provide the intended guest release; subsequent package updates belong to
+an explicitly reviewed `platform-config` workflow.
+
 Live snapshot acceptance additionally requires a single-node Proxmox VE 9 host with `bash`, `pvesh`, `jq`, and `qm`, plus enough snapshot-capable storage for two disposable clones, their additional disks, and optional saved memory state. See `proxmox-snapshot-test-environment.md`.
 
 Live config-test acceptance additionally requires the validated Rocky Linux 10.1

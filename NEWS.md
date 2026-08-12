@@ -13,6 +13,8 @@ Highlights:
   additional test disk.
 - Added saved-plan lifecycle, exclusive-use, strict SSH, and stable-device
   handoff guidance while keeping guest storage work outside this repository.
+- Disabled Proxmox cloud-init first-boot package upgrades so cloned guests retain
+  their reviewed template release until `platform-config` manages updates.
 - Added a reusable post-apply runbook for checking VM identity, initial SSH
   access, virtual hardware, network intent, guest-agent reporting, and drift.
 - Added host-key safety guidance and kept all illustrated identities and

@@ -22,6 +22,11 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Documented the disposable snapshot-test VM specification and safe procedures
   for provisioning, starting, and connecting to a reviewed test guest.
 
+### Fixed
+
+- Disabled Proxmox cloud-init automatic package upgrades, which could advance a
+  clone to a newer OS minor release before `platform-config` handoff.
+
 ## [1.5.1] - 2026-07-31
 
 ### Changed
