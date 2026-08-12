@@ -51,6 +51,7 @@ resource "proxmox_virtual_environment_vm" "this" {
       file_format  = coalesce(disk.value.file_format, var.disk_file_format)
       interface    = disk.value.interface
       iothread     = coalesce(disk.value.iothread, var.disk_iothread)
+      serial       = disk.value.serial
       size         = disk.value.size_gb
     }
   }

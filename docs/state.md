@@ -26,6 +26,7 @@ Each directory under `environments/` has independent state:
 
 - `environments/homelab` uses homelab state and `homelab.tfvars`.
 - `environments/dev` uses dev state and `dev.tfvars`.
+- `environments/config-test` uses disposable acceptance state and `config-test.tfvars`.
 - `environments/snapshot-test` uses disposable acceptance state and `snapshot-test.tfvars`.
 
 Do not switch independent VM sets by changing only the tfvars file inside one root. OpenTofu treats resources missing from the selected config as candidates for destruction.
@@ -53,4 +54,4 @@ Before CI apply is considered production-grade, add remote state with:
 - State locking.
 - Separate state per environment root.
 
-Keep the environment invariant unchanged: every `environments/<env>` root uses only its matching `<env>.tfvars` and independent state. Retain snapshot-test state until its two disposable VMs have been destroyed successfully.
+Keep the environment invariant unchanged: every `environments/<env>` root uses only its matching `<env>.tfvars` and independent state. Retain config-test or snapshot-test state until every VM in that disposable root has been destroyed successfully.

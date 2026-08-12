@@ -57,8 +57,9 @@ make env ENV=homelab PRIVATE=1
 $EDITOR ../platform-private/infra/homelab.tfvars
 ```
 
-Use `ENV=dev` for `../platform-private/infra/dev.tfvars` or
-`ENV=snapshot-test` for the disposable acceptance config.
+Use `ENV=dev` for `../platform-private/infra/dev.tfvars`, `ENV=config-test` for
+the platform-config acceptance fixture, or `ENV=snapshot-test` for the snapshot
+acceptance fixture.
 
 Only create a local ignored `terraform.tfvars` for isolated fallback testing:
 
@@ -78,7 +79,7 @@ source "../../../platform-private/infra/homelab.tofu.env"
 env | grep '^TF_CLI_ARGS_'
 ```
 
-Use the matching env file for every root. Homelab and dev set plan, apply, and destroy arguments. The snapshot-test env file intentionally unsets `TF_CLI_ARGS_apply` so only a reviewed saved plan can be applied; use the command documented in `proxmox-snapshot-test-environment.md`.
+Use the matching env file for every root. Homelab and dev set plan, apply, and destroy arguments. The config-test and snapshot-test env files intentionally unset `TF_CLI_ARGS_apply` so only reviewed saved plans can be applied; use each environment's specialized runbook.
 
 OpenTofu also auto-loads `terraform.tfvars` from the current environment root. If private workflow plans are using unexpected values, check for a local ignored `terraform.tfvars` that contains stale `proxmox_api_token`, `proxmox_api_token_file`, or other conflicting variables.
 
@@ -153,7 +154,8 @@ For local fallback config:
 make init-ssh
 ```
 
-Use the matching environment, including `ENV=snapshot-test PRIVATE=1` for disposable acceptance keys.
+Use the matching environment, including `ENV=config-test PRIVATE=1` or
+`ENV=snapshot-test PRIVATE=1` for disposable acceptance keys.
 
 The default per-VM key path pattern is:
 

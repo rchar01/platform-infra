@@ -9,6 +9,7 @@ Run this on every pull request. It verifies formatting, initialization, and stat
 ```bash
 make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=config-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
@@ -155,7 +156,8 @@ The invariant is strict:
 ```text
 environments/homelab uses platform-private/infra/homelab.tfvars
 environments/dev uses platform-private/infra/dev.tfvars
+environments/config-test uses platform-private/infra/config-test.tfvars
 environments/snapshot-test uses platform-private/infra/snapshot-test.tfvars
 ```
 
-Never cross-use tfvars between roots. CI may initialize and validate `snapshot-test`, but live snapshot mutation and rollback remain manual acceptance operations.
+Never cross-use tfvars between roots. CI may initialize and validate either disposable root, but live guest mutation, reboot, snapshot, rollback, apply, and destroy remain explicitly approved acceptance operations.

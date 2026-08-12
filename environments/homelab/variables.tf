@@ -171,6 +171,7 @@ variable "vms" {
       discard      = optional(string)
       file_format  = optional(string)
       iothread     = optional(bool)
+      serial       = optional(string)
     })), [])
 
     datastore_id            = optional(string)
@@ -210,5 +211,14 @@ variable "vms" {
       ]
     ]))
     error_message = "Each additional disk size_gb value must be greater than zero."
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for _, vm in var.vms : [
+        for disk in vm.additional_disks : disk.serial == null || can(regex("^[A-Za-z0-9._-]{1,20}$", disk.serial))
+      ]
+    ]))
+    error_message = "Each additional disk serial must contain 1-20 ASCII letters, digits, dots, underscores, or hyphens."
   }
 }

@@ -28,6 +28,7 @@ platform-template-builder -> platform-infra -> platform-config
 - Run native `tofu` commands from the selected environment root.
 - Use `environments/homelab` only with `homelab.tfvars` and homelab state.
 - Use `environments/dev` only with `dev.tfvars` and dev state.
+- Use `environments/config-test` only with `config-test.tfvars` and its disposable acceptance state.
 - Use `environments/snapshot-test` only with `snapshot-test.tfvars` and its disposable acceptance state.
 - Do not keep a local `environments/<env>/terraform.tfvars` file for the normal private workflow.
 - Do not commit real tfvars, state files, plan files, Proxmox tokens, or SSH private keys.
@@ -174,6 +175,15 @@ acceptance run:
 make env ENV=snapshot-test PRIVATE=1
 $EDITOR ../platform-private/infra/snapshot-test.tfvars
 make init-ssh ENV=snapshot-test PRIVATE=1
+```
+
+Create or refresh the disposable config-test config and key only for an isolated
+`platform-config` acceptance campaign:
+
+```bash
+make env ENV=config-test PRIVATE=1
+$EDITOR ../platform-private/infra/config-test.tfvars
+make init-ssh ENV=config-test PRIVATE=1
 ```
 
 The private tfvars files should reference the token file path, not the token value:
@@ -353,6 +363,24 @@ Apply only after reviewing the plan:
 ~/.local/bin/tofu apply
 ```
 
+## Config Test Workflow
+
+Use this root only for explicitly approved, isolated `platform-config`
+acceptance. Run setup helpers from the repository root:
+
+```bash
+make deps
+make env ENV=config-test PRIVATE=1
+make init-ssh ENV=config-test PRIVATE=1
+make validate ENV=config-test
+```
+
+The specialized
+[`proxmox-config-test-environment.md`](./proxmox-config-test-environment.md)
+runbook is authoritative for collision checks, exclusive-use reservation,
+saved-plan approval, provisioning, handoff, and destruction. Do not enroll the
+VM in normal dev, service, or storage inventories.
+
 ## Snapshot Test Workflow
 
 Use this root only for explicitly approved live acceptance of
@@ -386,6 +414,11 @@ source "../../../platform-private/infra/homelab.tofu.env"
 ```bash
 cd environments/dev
 source "../../../platform-private/infra/dev.tofu.env"
+```
+
+```bash
+cd environments/config-test
+source "../../../platform-private/infra/config-test.tofu.env"
 ```
 
 ```bash
@@ -433,10 +466,12 @@ rm -f destroy.tfplan
 ~/.local/bin/tofu state list
 ```
 
-Use `environments/dev` and `dev.tofu.env` for dev destroys. Snapshot-test uses
-the stricter saved-plan destruction procedure in
+Use `environments/dev` and `dev.tofu.env` for dev destroys. Config-test and
+snapshot-test use the stricter saved-plan destruction procedures in
+[`proxmox-config-test-environment.md`](./proxmox-config-test-environment.md) and
 [`proxmox-snapshot-test-environment.md`](./proxmox-snapshot-test-environment.md),
-only after normal snapshot cleanup and explicit review.
+only after the owning acceptance workflow releases the fixtures and explicit
+review succeeds.
 
 Prefer this over deleting VMs manually in Proxmox. Manual deletion leaves OpenTofu state stale and requires state repair.
 
@@ -447,6 +482,7 @@ Use this before review or commit. It does not contact Proxmox and does not need 
 ```bash
 make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=config-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
@@ -455,6 +491,7 @@ Equivalent local checks with the default install path are:
 ```bash
 make verify
 make verify ENV=dev
+make verify ENV=config-test
 make verify ENV=snapshot-test
 ```
 

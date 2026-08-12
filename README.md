@@ -52,7 +52,7 @@ Use Make targets from the repository root for setup, formatting, validation, and
 
 ## Platform Project
 
-This repository is one part of a multi-repository platform infrastructure project. The included `homelab` and `dev` roots are example environment names; the same workflow can be adapted for production environments with appropriate state, access control, review, backup, monitoring, and change-management controls. The `snapshot-test` root is a disposable acceptance fixture, not a production profile.
+This repository is one part of a multi-repository platform infrastructure project. The included `homelab` and `dev` roots are example environment names; the same workflow can be adapted for production environments with appropriate state, access control, review, backup, monitoring, and change-management controls. The `config-test` and `snapshot-test` roots are disposable acceptance fixtures, not production profiles.
 
 | Repository | Purpose |
 |---|---|
@@ -138,7 +138,7 @@ For Linux VMs on Proxmox, especially with ZFS-backed storage, the practical targ
 
 Repository boundary still applies. `platform-infra` may own virtual disk shape, datastore selection, controller, cache, IO thread, and discard settings. `platform-template-builder` owns template image preparation. `platform-config` owns guest partitioning, formatting, filesystems, LVM, mounts, and `fstab`.
 
-The module now defaults to `scsi_hardware = "virtio-scsi-single"`, disk `iothread = true`, `discard = "on"`, `cache = "none"`, and `file_format = "raw"`. Environment roots expose defaults and per-VM overrides for those settings; additional disks can override cache, discard, file format, and IO thread per disk.
+The module now defaults to `scsi_hardware = "virtio-scsi-single"`, disk `iothread = true`, `discard = "on"`, `cache = "none"`, and `file_format = "raw"`. Environment roots expose defaults and per-VM overrides for those settings; additional disks can override cache, discard, file format, IO thread, and an optional guest-visible serial per disk.
 
 QEMU guest agent filesystem trim integration stays disabled by default with `default_agent_trim = false`. Enable it only when the template reliably installs and starts `qemu-guest-agent`, the guest filesystem stack supports fstrim safely, and the operator wants Proxmox-triggered guest fstrim in addition to disk-level discard. Inspect `tofu plan` carefully before applying these settings to existing VMs because disk/controller changes can require shutdowns or affect cloned disk attributes.
 
@@ -150,10 +150,15 @@ The normal operator workflow uses a sibling private repository for environment v
 ../platform-private/infra/
   homelab.tfvars
   dev.tfvars
+  config-test.tfvars
   snapshot-test.tfvars
   homelab.tofu.env
   dev.tofu.env
+  config-test.tofu.env
   snapshot-test.tofu.env
+  config-test/
+    operator-overlay.md
+    evidence/
   snapshot-test/
     operator-overlay.md
     evidence/
@@ -177,11 +182,17 @@ Current roots:
 
 - `environments/homelab`.
 - `environments/dev`.
+- `environments/config-test`, a disposable one-VM platform-config acceptance root.
 - `environments/snapshot-test`, a disposable two-VM acceptance root.
 
 Each root must use only its matching tfvars and state. Switching VM sets inside one state root can make OpenTofu plan to destroy resources that disappeared from the selected config.
 
-The snapshot-test root provisions disposable VMs for live testing of `platform-proxmox-vm-snapshot`. Keep its state and private config for repeatability, but destroy the VMs after acceptance. See `docs/proxmox-snapshot-test-environment.md`.
+The config-test root provisions one reusable disposable VM for isolated
+`platform-config` acceptance. The snapshot-test root provisions two disposable
+VMs for live testing of `platform-proxmox-vm-snapshot`. Keep each root's state
+and private config for repeatability, but destroy its VMs after acceptance. See
+`docs/proxmox-config-test-environment.md` and
+`docs/proxmox-snapshot-test-environment.md`.
 
 To remove managed VMs, use the destroy workflow in `docs/workflow.md` from the selected environment root. Do not delete OpenTofu-managed VMs manually in Proxmox unless you are intentionally repairing state.
 

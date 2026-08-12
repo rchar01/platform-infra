@@ -8,6 +8,11 @@ Manual VM verification guidance.
 
 Highlights:
 
+- Added an isolated, reusable `config-test` root for disposable
+  `platform-config` acceptance, with one Rocky Linux VM and a serial-identified
+  additional test disk.
+- Added saved-plan lifecycle, exclusive-use, strict SSH, and stable-device
+  handoff guidance while keeping guest storage work outside this repository.
 - Added a reusable post-apply runbook for checking VM identity, initial SSH
   access, virtual hardware, network intent, guest-agent reporting, and drift.
 - Added host-key safety guidance and kept all illustrated identities and

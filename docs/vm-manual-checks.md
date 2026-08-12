@@ -9,10 +9,12 @@ This runbook verifies infrastructure handoff readiness. Filesystems, mounts,
 packages, users beyond the initial cloud-init user, firewall policy, and service
 health belong to `platform-config` or another owning project.
 
-For `snapshot-test`, the stricter
-[snapshot-test environment runbook](proxmox-snapshot-test-environment.md)
-remains authoritative. This document does not replace its saved-plan,
-acceptance, or destruction gates.
+For `config-test` and `snapshot-test`, the stricter environment runbooks remain
+authoritative. See the
+[config-test environment runbook](proxmox-config-test-environment.md) and
+[snapshot-test environment runbook](proxmox-snapshot-test-environment.md).
+This document does not replace their saved-plan, acceptance, or destruction
+gates.
 
 ## Safety
 

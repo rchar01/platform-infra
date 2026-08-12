@@ -9,6 +9,13 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added an independent one-VM `config-test` OpenTofu root for reusable,
+  disposable `platform-config` acceptance.
+- Added optional serial identifiers for additional VM disks, including
+  conservative validation and structured handoff output.
+- Added a config-test lifecycle runbook covering collision checks, reviewed
+  saved-plan creation and destruction, strict SSH access, exclusive campaign
+  ownership, and stable guest-device verification.
 - Added a sanitized manual VM verification runbook for checking OpenTofu
   outputs, SSH access, guest identity and network intent, virtual hardware,
   guest-agent health, Proxmox configuration, and post-apply drift.

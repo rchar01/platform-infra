@@ -59,11 +59,17 @@ The maintained OpenTofu roots are independent:
 
 - `environments/homelab` uses homelab state and `homelab.tfvars`.
 - `environments/dev` uses dev state and `dev.tfvars`.
+- `environments/config-test` uses disposable acceptance state and `config-test.tfvars`.
 - `environments/snapshot-test` uses disposable acceptance state and `snapshot-test.tfvars`.
 
 Use native OpenTofu for `plan`, `apply`, and `destroy` from the selected environment root. Use Make targets from the repository root for setup, formatting, and validation helpers.
 
 Live snapshot acceptance additionally requires a single-node Proxmox VE 9 host with `bash`, `pvesh`, `jq`, and `qm`, plus enough snapshot-capable storage for two disposable clones, their additional disks, and optional saved memory state. See `proxmox-snapshot-test-environment.md`.
+
+Live config-test acceptance additionally requires the validated Rocky Linux 10.1
+template, capacity for one disposable clone and its test disk, trusted console
+access for SSH host-key authentication, and an isolated `platform-config`
+inventory. See `proxmox-config-test-environment.md`.
 
 ## CI Requirements
 

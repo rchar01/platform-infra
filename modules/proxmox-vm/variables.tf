@@ -67,6 +67,7 @@ variable "additional_disks" {
     discard      = optional(string)
     file_format  = optional(string)
     iothread     = optional(bool)
+    serial       = optional(string)
   }))
   default = []
 
@@ -89,6 +90,13 @@ variable "additional_disks" {
       for disk in var.additional_disks : contains(["raw", "qcow2", "vmdk"], coalesce(disk.file_format, "raw"))
     ])
     error_message = "Each additional disk file_format value must be one of raw, qcow2, or vmdk."
+  }
+
+  validation {
+    condition = alltrue([
+      for disk in var.additional_disks : disk.serial == null || can(regex("^[A-Za-z0-9._-]{1,20}$", disk.serial))
+    ])
+    error_message = "Each additional disk serial must contain 1-20 ASCII letters, digits, dots, underscores, or hyphens."
   }
 }
 

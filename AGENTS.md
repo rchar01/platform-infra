@@ -35,7 +35,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 
 ## OpenTofu Workflow
 
-- Execution roots live under `environments/`; `homelab`, `dev`, and `snapshot-test` have independent state.
+- Execution roots live under `environments/`; `homelab`, `dev`, `config-test`, and `snapshot-test` have independent state.
 - Treat `homelab` and `dev` as example environment names, not capability limits. Keep references to `environments/homelab`, `homelab.tfvars`, and `ENV=homelab` when documenting that root, but use neutral wording such as "private environment", "environment root", or "platform environment" for general workflow language.
 - Environment `versions.tf` files currently require OpenTofu `>= 1.11.7` and `bpg/proxmox` provider `~> 0.106`.
 - Prefer root Make targets for setup only: `make deps`, `make env`, `make init-ssh`, `make init`, `make fmt`, `make validate`.
@@ -47,8 +47,9 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Proxmox API user/token bootstrap belongs in `platform-tools` (`platform-proxmox-token-init`), not in this repo. This repo consumes an existing token.
 - Per-VM cloud-init SSH keys are generated under `~/.ssh` by `platform-ssh-init`; private Git stores only non-secret config and references.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
-- For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root. Homelab and dev set plan, apply, and destroy arguments; snapshot-test intentionally unsets apply arguments and requires saved-plan apply.
+- For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root. Homelab and dev set plan, apply, and destroy arguments; config-test and snapshot-test intentionally unset apply arguments and require saved-plan apply.
 - Never cross-use tfvars or state between environment roots.
+- `config-test` owns one disposable VM for isolated `platform-config` acceptance. Keep it out of normal environment and service inventories, allow only one active campaign, and use `docs/proxmox-config-test-environment.md` for lifecycle gates. Guest mutation remains owned by the test-specific `platform-config` workflow.
 - `snapshot-test` owns two disposable VMs for manual `platform-proxmox-vm-snapshot` acceptance. Do not add services or guest disk preparation here. Use `docs/proxmox-snapshot-test-environment.md` for VM lifecycle gates and the tool-owned live-acceptance runbook for snapshot mutation gates.
 - Normal Make command order:
 
@@ -82,6 +83,7 @@ make validate
 - QEMU guest agent fstrim integration defaults to disabled with `default_agent_trim = false`; enable it only when the template reliably runs `qemu-guest-agent` and guest filesystem trim behavior is intentional.
 - DHCP is the default network mode. Actual leased IP outputs require a working guest agent.
 - Additional virtual disks are infra-owned only until the device exists; guest storage configuration belongs in `platform-config`.
+- Optional additional-disk serials are guest-visible identity intent, not proof of a stable guest path. Verify `/dev/disk/by-id/` or `/dev/disk/by-path/` before destructive guest storage work.
 - `ansible_inventory_map` is only a structured handoff for future `platform-config`; do not generate Ansible roles or playbooks here.
 
 ## What To Extract During Future Updates
