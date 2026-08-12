@@ -103,6 +103,10 @@ or destroy. Record the checksum and obtain explicit approval for that exact
 artifact. Then apply only the saved plan:
 
 ```bash
+approved_plan_sha256="<approved-create-plan-sha256>"
+
+test "$(sha256sum config-test.tfplan | cut -d ' ' -f 1)" = \
+  "$approved_plan_sha256" &&
 TF_CLI_ARGS_apply= ~/.local/bin/tofu apply config-test.tfplan
 ```
 
@@ -207,6 +211,10 @@ Require exactly one destroy and no other action. Obtain explicit approval for
 that checksum, then apply only that artifact:
 
 ```bash
+approved_plan_sha256="<approved-destroy-plan-sha256>"
+
+test "$(sha256sum config-test-destroy.tfplan | cut -d ' ' -f 1)" = \
+  "$approved_plan_sha256" &&
 TF_CLI_ARGS_apply= ~/.local/bin/tofu apply config-test-destroy.tfplan
 ```
 
