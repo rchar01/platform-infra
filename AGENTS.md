@@ -50,7 +50,7 @@ Compact guidance for future agent sessions in `platform-infra`.
 - Use native `tofu` for `plan`, `apply`, and `destroy` from the selected environment root with the matching tfvars file.
 - For local private workflows, source the matching `../../../platform-private/infra/<env>.tofu.env` file from the selected environment root. Homelab and dev set plan, apply, and destroy arguments; config-test and snapshot-test intentionally unset apply arguments and require saved-plan apply.
 - Never cross-use tfvars or state between environment roots.
-- `config-test` owns one disposable VM for isolated `platform-config` acceptance. Keep it out of normal environment and service inventories, allow only one active campaign, and use `docs/proxmox-config-test-environment.md` for lifecycle gates. Guest mutation remains owned by the test-specific `platform-config` workflow.
+- `config-test` declares one on-demand disposable VM for isolated `platform-config` acceptance. Its expected idle state is no live VM and valid empty state; a VM exists only for an approved campaign. Keep it out of normal environment and service inventories, allow only one active campaign, and use `docs/proxmox-config-test-environment.md` for lifecycle gates. Guest mutation remains owned by the test-specific `platform-config` workflow. SSH trust, stable-device paths, reservations, and readiness observations expire when an incarnation is destroyed.
 - `snapshot-test` owns two disposable VMs for manual `platform-proxmox-vm-snapshot` acceptance. Do not add services or guest disk preparation here. Use `docs/proxmox-snapshot-test-environment.md` for VM lifecycle gates and the tool-owned live-acceptance runbook for snapshot mutation gates.
 - Normal Make command order:
 

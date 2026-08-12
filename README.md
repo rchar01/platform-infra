@@ -187,8 +187,10 @@ Current roots:
 
 Each root must use only its matching tfvars and state. Switching VM sets inside one state root can make OpenTofu plan to destroy resources that disappeared from the selected config.
 
-The config-test root provisions one reusable disposable VM for isolated
-`platform-config` acceptance. The snapshot-test root provisions two disposable
+The config-test root defines an on-demand one-VM fixture for isolated
+`platform-config` acceptance. Its configuration and empty state are reusable,
+but each live VM incarnation exists only for an approved campaign and is
+destroyed afterward. The snapshot-test root provisions two disposable
 VMs for live testing of `platform-proxmox-vm-snapshot`. Keep each root's state
 and private config for repeatability, but destroy its VMs after acceptance. See
 `docs/proxmox-config-test-environment.md` and

@@ -21,7 +21,7 @@ Then use the supporting docs as references.
 | Design CI validation, plan, and apply jobs | `ci.md` |
 | Choose VM names and VM IDs | `naming-conventions.md` |
 | Verify provisioned VMs manually | `vm-manual-checks.md` |
-| Operate the disposable platform-config test environment | `proxmox-config-test-environment.md` |
+| Operate the on-demand disposable platform-config fixture | `proxmox-config-test-environment.md` |
 | Operate the disposable snapshot acceptance environment | `proxmox-snapshot-test-environment.md` |
 | Check public examples before publishing | `publication-checklist.md` |
 | Debug provisioning failures | `troubleshooting.md` |

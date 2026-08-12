@@ -54,4 +54,10 @@ Before CI apply is considered production-grade, add remote state with:
 - State locking.
 - Separate state per environment root.
 
-Keep the environment invariant unchanged: every `environments/<env>` root uses only its matching `<env>.tfvars` and independent state. Retain config-test or snapshot-test state until every VM in that disposable root has been destroyed successfully.
+Keep the environment invariant unchanged: every `environments/<env>` root uses
+only its matching `<env>.tfvars` and independent state. Retain config-test or
+snapshot-test state through successful destruction. For config-test, preserve
+the valid empty state afterward; empty state plus retained configuration is the
+expected idle condition, and a normal plan should intentionally propose one
+create. Never remove state as a substitute for destroying or reconciling a live
+VM.

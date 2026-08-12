@@ -271,13 +271,18 @@ Expected private layout:
 ../platform-private/infra/
   homelab.tfvars
   dev.tfvars
+  config-test.tfvars
   snapshot-test.tfvars
   homelab.tofu.env
   dev.tofu.env
+  config-test.tofu.env
   snapshot-test.tofu.env
 ```
 
-The `.tofu.env` files contain no secrets. Homelab and dev set `TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy`. Snapshot-test sets plan and destroy arguments but intentionally unsets apply arguments so applying requires a reviewed saved plan.
+The `.tofu.env` files contain no secrets. Homelab and dev set
+`TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy`. Config-test
+and snapshot-test intentionally unset apply arguments so applying requires a
+reviewed saved plan.
 
 `make init-ssh` reads the selected environment's `vms` map and generates one local cloud-init SSH keypair per VM with `platform-ssh-init`. The default key path pattern is:
 
@@ -380,6 +385,12 @@ The specialized
 runbook is authoritative for collision checks, exclusive-use reservation,
 saved-plan approval, provisioning, handoff, and destruction. Do not enroll the
 VM in normal dev, service, or storage inventories.
+
+The fixture is normally absent with valid empty state and an inactive private
+inventory. Create it only for a named campaign. A `platform-config` coder may
+use it only after the current VM incarnation has passed fresh host-key,
+readiness, and stable-disk handoff gates. Destroy it and retire those bindings
+when the campaign releases it.
 
 ## Snapshot Test Workflow
 

@@ -13,6 +13,9 @@ Highlights:
   additional test disk.
 - Added saved-plan lifecycle, exclusive-use, strict SSH, and stable-device
   handoff guidance while keeping guest storage work outside this repository.
+- Config-test now explicitly uses an on-demand lifecycle: retain its definition
+  and empty state, but create and accept a fresh VM for each campaign and destroy
+  it after release.
 - Disabled Proxmox cloud-init first-boot package upgrades; templates provide the
   initial guest release and `platform-config` manages subsequent updates.
 - Added a reusable post-apply runbook for checking VM identity, initial SSH

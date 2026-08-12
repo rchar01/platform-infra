@@ -16,6 +16,8 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added a config-test lifecycle runbook covering collision checks, reviewed
   saved-plan creation and destruction, strict SSH access, exclusive campaign
   ownership, and stable guest-device verification.
+- Defined config-test as an on-demand fixture whose expected idle state is no
+  live VM and valid empty state, with per-incarnation trust and disk handoff.
 - Added a sanitized manual VM verification runbook for checking OpenTofu
   outputs, SSH access, guest identity and network intent, virtual hardware,
   guest-agent health, Proxmox configuration, and post-apply drift.

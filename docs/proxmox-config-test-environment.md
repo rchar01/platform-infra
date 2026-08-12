@@ -2,9 +2,11 @@
 
 ## Purpose
 
-The `environments/config-test` OpenTofu root provisions one disposable Rocky
-Linux VM for isolated `platform-config` acceptance. It is a general test fixture;
-storage is its first campaign, not its permanent exclusive purpose.
+The `environments/config-test` OpenTofu root defines one on-demand disposable
+Rocky Linux VM for isolated `platform-config` acceptance. The expected idle
+state is empty OpenTofu state and no live VM. Create a fresh VM incarnation for
+an explicitly named campaign and destroy it when the handoff is released.
+Storage is the first campaign, not the fixture's permanent exclusive purpose.
 
 This root owns VM existence, shape, network intent, initial cloud-init access,
 and handoff outputs. `platform-config` owns packages, partitioning, LVM,
@@ -14,6 +16,12 @@ belong in `platform-private`.
 Do not reuse `snapshot-test`: that two-VM root has a separate snapshot-tool
 acceptance contract. Do not add `config-test` to `dev`, RKE2, service, or normal
 storage inventories.
+
+The root, private inputs, SSH identity, and valid empty state are reusable. A
+live VM, authenticated host key, stable guest-device path, reservation, and
+readiness observations are bound to one incarnation and expire at destruction.
+Reusing a VM ID, hostname, address, serial, or by-id string does not carry those
+acceptance results into a recreated VM.
 
 ## Disposable VM Specification
 
@@ -73,12 +81,15 @@ VM and one additional 32 GiB `scsi1` disk with the approved serial.
 Before every create plan, verify through authoritative Proxmox and network
 records that:
 
+- the config-test OpenTofu state is empty;
 - the proposed VM ID does not exist;
 - the proposed hostname is unused;
 - the proposed static address is unassigned;
 - the Rocky Linux 10.1 template exists and retains a compatible `host` CPU;
 - the selected bridge and datastores exist and have sufficient capacity;
 - no active test campaign owns the `config-test` fixture; and
+- the private config-test inventory has no active host and no accepted stable
+  device from an earlier incarnation; and
 - no unrelated VM carries the `config-test` tag.
 
 Silence from ICMP alone does not prove that an address is free. Use the private
@@ -104,6 +115,10 @@ sha256sum config-test.tfplan
 The reviewed plan must contain exactly one create and no update, replacement,
 or destroy. Record the checksum and obtain explicit approval for that exact
 artifact. Then apply only the saved plan:
+
+Immediately before applying, use the private operator overlay to repeat
+empty-state, live VM/name/tag absence, and same-subnet address checks. Continue
+only if all checks succeed.
 
 ```bash
 approved_plan_sha256="<approved-create-plan-sha256>"
@@ -195,10 +210,26 @@ operator, start time, accepted VM identity, and accepted stable test-disk path.
 Only one campaign may own the VM. Destroy and recreate it between incompatible
 or destructive campaigns; do not depend on cleanup of unknown prior state.
 
+After authenticating the current VM's host key and recording a newly verified
+stable non-root disk path, create immutable handoff and exclusive reservation
+evidence. Only then activate the host in the isolated private inventory. A
+`platform-config` coder may then run the campaign-specific read-only preflight
+and seek any separately required mutation or reboot approval. Never treat a
+committed address, old fingerprint, or historical stable path as a current live
+handoff.
+
 ## Destroy
 
-After the owning campaign releases the VM, generate a separate saved destroy
-plan:
+After the owning campaign or unused infrastructure handoff is released, first:
+
+- confirm no downstream process or operator owns the VM;
+- accept total loss of all disposable guest data;
+- deactivate the host in the private config-test inventory;
+- remove the incarnation-specific `stable_device` from active host variables;
+  and
+- create a new immutable private release record.
+
+Then generate a separate saved destroy plan:
 
 ```bash
 cd environments/config-test
@@ -211,17 +242,57 @@ sha256sum config-test-destroy.tfplan
 ```
 
 Require exactly one destroy and no other action. Obtain explicit approval for
-that checksum, then apply only that artifact:
+that checksum. Immediately before applying, use the private operator overlay to
+match the live VM's recorded incarnation identifier, expected managed volumes,
+identity, tags, and lock state. This prevents an approved plan from destroying a
+replacement VM that reused the same VM ID and hostname. Then apply only that
+artifact:
 
 ```bash
 approved_plan_sha256="<approved-destroy-plan-sha256>"
 
+assert_config_test_target &&
 test "$(sha256sum config-test-destroy.tfplan | cut -d ' ' -f 1)" = \
   "$approved_plan_sha256" &&
 TF_CLI_ARGS_apply= ~/.local/bin/tofu apply config-test-destroy.tfplan
 ```
 
 Confirm empty state and no live VM with the private identity or `config-test`
-tag. Remove local saved plans only after successful destruction. Never recover
+tag. Only after both checks pass:
+
+1. Remove stale known-host entries for the retired address and hostname with
+   `ssh-keygen -R` against the operator's configured `known_hosts` file.
+2. Confirm the private inventory remains inactive and has no `stable_device`.
+3. Record apply results, empty state, live absence, trust cleanup, and binding
+   cleanup in a new immutable private completion record.
+4. Remove local saved plan files.
+
+Retain the private tfvars, `.tofu.env`, dedicated SSH identity, and valid empty
+state for future recreation. A normal plan from this idle state should propose
+exactly one create because the fixture contract remains declared. Never recover
 from state disagreement by deleting a live VM manually; reconcile ownership and
 state first.
+
+## Recreate For A Future Campaign
+
+1. Name the campaign, responsible coder or operator, and requested test scope.
+2. Confirm empty state, inactive private inventory, no reservation, and no
+   incarnation-specific `stable_device`.
+3. Revalidate VM ID, hostname, address, tag uniqueness, template, bridge, and
+   datastore capacity through authoritative sources.
+4. Generate a saved plan containing exactly one create, record its SHA-256, and
+   obtain explicit approval for that exact artifact.
+5. Apply only the approved plan and verify VM shape, Rocky Linux release,
+   cloud-init, guest agent, and a no-change refreshed plan.
+6. Record the newly generated Proxmox incarnation identifier and complete
+   managed disk configurations in immutable private handoff evidence.
+7. Authenticate the new SSH host key through a trusted channel; do not inherit
+   the retired key.
+8. Resolve the serial-identified test disk to a stable non-root guest path and
+   record the new observation privately.
+9. Complete immutable handoff and exclusive reservation evidence bound to this VM
+   incarnation.
+10. Activate the isolated private inventory only after that record exists.
+11. Hand the VM to the `platform-config` coder. Guest mutation and reboot remain
+   governed by that test-specific workflow and its separate approvals.
+12. On campaign release, repeat the saved-plan destruction procedure above.
