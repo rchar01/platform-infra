@@ -12,6 +12,8 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added a sanitized manual VM verification runbook for checking OpenTofu
   outputs, SSH access, guest identity and network intent, virtual hardware,
   guest-agent health, Proxmox configuration, and post-apply drift.
+- Documented the disposable snapshot-test VM specification and safe procedures
+  for provisioning, starting, and connecting to a reviewed test guest.
 
 ## [1.5.1] - 2026-07-31
 

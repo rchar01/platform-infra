@@ -12,6 +12,8 @@ Highlights:
   access, virtual hardware, network intent, guest-agent reporting, and drift.
 - Added host-key safety guidance and kept all illustrated identities and
   addresses fictional.
+- Documented how to provision, start, and safely connect to the disposable
+  snapshot-test VMs while keeping real bindings in private operator config.
 
 ## v1.5.1 - 2026-07-31
 

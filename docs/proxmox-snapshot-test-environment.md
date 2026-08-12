@@ -40,9 +40,12 @@ Retain these assets between runs:
 State, saved plans, private keys, tokens, and real infrastructure values must
 remain outside Git. Remove ignored saved-plan files after every completed run.
 
-## Public Test Shape
+## Disposable VM Specification
 
-The public example remains neutral. Real values belong only in private config.
+The root manages two equivalent Rocky Linux disposable VMs cloned from an
+existing cloud template. The public example remains neutral. Real VM IDs,
+names, addresses, Proxmox node, template, bridge, and datastore values belong
+only in private config.
 
 | Property | Test VM 1 | Test VM 2 |
 | --- | --- | --- |
@@ -54,6 +57,13 @@ The public example remains neutral. Real values belong only in private config.
 | Memory | 2048 MiB | 2048 MiB |
 | Boot disk | 20 GiB | 20 GiB |
 | Additional disk | 5 GiB on `scsi1` | 5 GiB on `scsi1` |
+| Cloud-init user | `rocky` | `rocky` |
+| QEMU guest agent | Enabled | Enabled |
+
+Unless private config explicitly overrides them, both VMs use a
+`virtio-scsi-single` controller, disk IO threads, discard `on`, cache `none`,
+and raw disk format. The additional disk is attached infrastructure only; this
+repository does not partition, format, or mount it.
 
 The root automatically adds `managed-by-tofu` and `snapshot-test`. The exact
 four-tag set on each live VM must therefore be `disposable`,
@@ -93,7 +103,7 @@ Before provisioning:
 Stop if an identifier is already in use or if the plan includes any existing
 resource.
 
-## Provision
+## Provision And Start
 
 Run setup helpers from the repository root:
 
@@ -127,7 +137,24 @@ TF_CLI_ARGS_apply= ~/.local/bin/tofu apply snapshot-test.tfplan
 
 Do not substitute an unsaved apply. `snapshot-test.tofu.env` intentionally
 unsets `TF_CLI_ARGS_apply` because a saved plan already contains its input
-values.
+values. The locked `bpg/proxmox` provider version defaults managed VMs to a
+started state, so a successful create apply should leave both VMs running. No
+separate power-on command is expected during normal provisioning.
+
+If an already-provisioned disposable VM is stopped, first confirm its exact
+private VM ID, name, complete four-tag set, and absent lock. After approval to
+start that exact target, use the Proxmox UI or an authorized Proxmox shell:
+
+```bash
+qm status <private-vm-id> &&
+qm config <private-vm-id> &&
+qm start <private-vm-id> &&
+qm status <private-vm-id>
+```
+
+Start only one reviewed target at a time. Do not use a public example VM ID or
+select a target by a partial name. Treat `qm config` output as private
+operational data.
 
 ## Verify Provisioning
 
@@ -144,6 +171,64 @@ Proxmox queries:
 - passwordless administrative access and `qemu-guest-agent` are healthy
 - neither VM appears in a platform service inventory
 - a refresh plan reports no drift
+
+## Connect To A Guest
+
+From the isolated OpenTofu root and the shell where the matching private
+environment file was sourced, inspect the connection handoff:
+
+```bash
+~/.local/bin/tofu output ansible_inventory_map
+```
+
+For one reviewed inventory key, obtain `ansible_host`, `ansible_user`,
+`ansible_ssh_private_key_file`, and `vm_id`. Keep those real values in the
+private operator overlay or ephemeral shell variables, not in this repository.
+The following values are placeholders:
+
+```bash
+vm_host="<private-address>"
+vm_user="<cloud-init-user>"
+vm_identity="$HOME/.ssh/<private-cloud-init-key>"
+vm_known_hosts="$HOME/.ssh/known_hosts"
+
+test -r "$vm_identity"
+```
+
+If the output key path starts with `~/`, use `$HOME/` when assigning it to a
+quoted variable because a quoted tilde does not expand. Before accepting an
+initial host key, compare its fingerprint with the guest's host-key fingerprint
+observed through the Proxmox console or another trusted channel. Then connect
+with the dedicated guest identity:
+
+```bash
+ssh -o IdentitiesOnly=yes \
+  -o StrictHostKeyChecking=ask \
+  -o UserKnownHostsFile="$vm_known_hosts" \
+  -i "$vm_identity" \
+  "${vm_user}@${vm_host}"
+```
+
+Do not bypass a mismatch with `StrictHostKeyChecking=no`. For a legitimately
+replaced VM, inspect the existing entry with
+`ssh-keygen -F "$vm_host" -f "$vm_known_hosts"` and remove it only after the
+replacement identity has been independently verified.
+
+After connecting, these read-only checks confirm basic handoff readiness:
+
+```bash
+hostnamectl --static
+cloud-init status --long
+ip -brief address
+ip route
+lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS
+systemctl is-active qemu-guest-agent
+sudo -n true
+```
+
+The observations must match the reviewed private configuration and disposable
+VM specification. Guest filesystem preparation for snapshot acceptance follows
+the tool-owned runbook; do not perform it as part of this connection check.
 
 ## Run Live Acceptance
 
