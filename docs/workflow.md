@@ -102,11 +102,15 @@ make deps TOFU_VERSION=1.11.7 TOFU_INSTALL_DIR="$PWD/.tools/bin"
 
 ## One-Time Local Private Setup
 
-Provision the local outside-Git config directory and placeholder secret files with `platform-tools`:
+Provision the local outside-Git security-sensitive namespace with `platform-tools`:
 
 ```bash
 platform-config-init
 ```
+
+The initializer creates only the protected `infra/`, `config/`, and `pki/`
+namespaces plus its README. It intentionally creates no placeholder token or
+secret files; use the owning helper to publish each concrete input.
 
 If `platform-config-init` is unavailable, create the base directory manually as a fallback:
 

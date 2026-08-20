@@ -20,7 +20,7 @@ Use `TOFU_INSTALL_DIR` to choose a different binary directory. CI commonly keeps
 
 Recommended shared platform tools:
 
-- `platform-config-init` from `platform-tools` for provisioning the local outside-Git config directory and placeholder secret files.
+- `platform-config-init` from `platform-tools` for provisioning the protected local outside-Git namespace; concrete files are created by their owning helper, project, or explicit workflow.
 - `platform-proxmox-token-init` from `platform-tools` for Proxmox API user/token bootstrap over SSH from the operator workstation.
 - `platform-ssh-init` from `platform-tools` for per-VM cloud-init SSH keypair creation.
 

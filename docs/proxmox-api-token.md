@@ -78,7 +78,12 @@ pveum aclmod / -user <automation-user>@<realm> -role Administrator
 
 Store the real token outside every Git repository or in a local secret manager. Never commit the real token.
 
-The normal local setup uses `platform-config-init` to create the directory and placeholder files. If `platform-tools` is unavailable, create the directory and token file manually as a fallback:
+The normal local setup uses `platform-config-init` to create the protected root,
+`infra/`, `config/`, `pki/`, and `README.md`. It intentionally does not create a
+placeholder token. Use
+`platform-proxmox-token-init --write-token-file` for the normal token workflow.
+If `platform-tools` is unavailable, create the directory and token file manually
+as a fallback:
 
 ```bash
 mkdir -p ~/.config/platform-infrastructure/infra
