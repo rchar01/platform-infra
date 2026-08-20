@@ -7,6 +7,10 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+No unreleased changes.
+
+## [1.6.0] - 2026-08-20
+
 ### Added
 
 - Added an independent one-VM `config-test` OpenTofu root for reusable,

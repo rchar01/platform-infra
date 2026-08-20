@@ -4,7 +4,11 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-Manual VM verification guidance.
+No unreleased changes.
+
+## v1.6.0 - 2026-08-20
+
+Disposable config acceptance, cloud-init upgrade control, and VM verification.
 
 Highlights:
 
