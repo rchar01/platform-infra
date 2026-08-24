@@ -4,6 +4,10 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
+No unreleased changes.
+
+## v1.6.1 - 2026-08-24
+
 Rocky Linux migration baseline infrastructure.
 
 Highlights:
