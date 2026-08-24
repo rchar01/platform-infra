@@ -6,9 +6,9 @@ This directory documents how `platform-infra` fits into the platform workspace a
 
 Read `workflow.md` first. It is the canonical guide for common initialization,
 private setup, environment selection, validation, destroy, and CI workflow
-shape. The config-test and snapshot-test lifecycle documents are authoritative
-where their stricter saved-plan and acceptance gates differ from the common
-workflow.
+shape. The config-test, snapshot-test, and migration-test lifecycle documents
+are authoritative where their stricter saved-plan and acceptance gates differ
+from the common workflow.
 
 Then use the supporting docs as references.
 
@@ -23,6 +23,7 @@ Then use the supporting docs as references.
 | Verify provisioned VMs manually | `vm-manual-checks.md` |
 | Operate the on-demand disposable platform-config fixture | `proxmox-config-test-environment.md` |
 | Operate the disposable snapshot acceptance environment | `proxmox-snapshot-test-environment.md` |
+| Operate the disposable Rocky migration baselines | `proxmox-migration-test-environment.md` |
 | Check public examples before publishing | `publication-checklist.md` |
 | Debug provisioning failures | `troubleshooting.md` |
 | Review intentionally deferred work | `roadmap.md` |

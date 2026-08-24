@@ -30,6 +30,7 @@ platform-template-builder -> platform-infra -> platform-config
 - Use `environments/dev` only with `dev.tfvars` and dev state.
 - Use `environments/config-test` only with `config-test.tfvars` and its disposable acceptance state.
 - Use `environments/snapshot-test` only with `snapshot-test.tfvars` and its disposable acceptance state.
+- Use `environments/migration-test` only with `migration-test.tfvars` and its disposable acceptance state.
 - Do not keep a local `environments/<env>/terraform.tfvars` file for the normal private workflow.
 - Do not commit real tfvars, state files, plan files, Proxmox tokens, or SSH private keys.
 - Run `tofu apply` and `tofu destroy` only after reviewing the selected environment and plan.
@@ -190,6 +191,15 @@ $EDITOR ../platform-private/infra/config-test.tfvars
 make init-ssh ENV=config-test PRIVATE=1
 ```
 
+Create or refresh the disposable migration-test config and keys only for a
+consumer-owned migration campaign:
+
+```bash
+make env ENV=migration-test PRIVATE=1
+$EDITOR ../platform-private/infra/migration-test.tfvars
+make init-ssh ENV=migration-test PRIVATE=1
+```
+
 The private tfvars files should reference the token file path, not the token value:
 
 ```hcl
@@ -277,16 +287,18 @@ Expected private layout:
   dev.tfvars
   config-test.tfvars
   snapshot-test.tfvars
+  migration-test.tfvars
   homelab.tofu.env
   dev.tofu.env
   config-test.tofu.env
   snapshot-test.tofu.env
+  migration-test.tofu.env
 ```
 
 The `.tofu.env` files contain no secrets. Homelab and dev set
-`TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy`. Config-test
-and snapshot-test intentionally unset apply arguments so applying requires a
-reviewed saved plan.
+`TF_CLI_ARGS_plan`, `TF_CLI_ARGS_apply`, and `TF_CLI_ARGS_destroy`. Config-test,
+snapshot-test, and migration-test intentionally unset apply arguments so
+applying requires a reviewed saved plan.
 
 `make init-ssh` reads the selected environment's `vms` map and generates one local cloud-init SSH keypair per VM with `platform-ssh-init`. The default key path pattern is:
 
@@ -415,6 +427,25 @@ verification, and destruction. Do not use the general apply or destroy examples
 below for this stricter root. Snapshot operations follow the tool-owned live
 acceptance runbook; do not enroll the disposable VMs in platform services.
 
+## Migration Test Workflow
+
+Use this root only to provision clean Rocky Linux 10.0 and 10.1 baselines for an
+explicitly approved, consumer-owned migration campaign:
+
+```bash
+make deps
+make env ENV=migration-test PRIVATE=1
+make init-ssh ENV=migration-test PRIVATE=1
+make validate ENV=migration-test
+```
+
+The specialized
+[`proxmox-migration-test-environment.md`](./proxmox-migration-test-environment.md)
+runbook is authoritative for template and collision preflight, saved-plan
+approval, exact-version handoff, consumer reservation, and destruction. This
+repository does not configure or mutate either guest. Do not enroll the VMs in
+normal platform services, and recreate both baselines for each clean campaign.
+
 ## Switching Environments
 
 Use a new shell or source the matching env file whenever switching environment roots:
@@ -439,6 +470,11 @@ source "../../../platform-private/infra/config-test.tofu.env"
 ```bash
 cd environments/snapshot-test
 source "../../../platform-private/infra/snapshot-test.tofu.env"
+```
+
+```bash
+cd environments/migration-test
+source "../../../platform-private/infra/migration-test.tofu.env"
 ```
 
 Never cross-use tfvars or state between roots. Each root has an independent VM
@@ -481,12 +517,14 @@ rm -f destroy.tfplan
 ~/.local/bin/tofu state list
 ```
 
-Use `environments/dev` and `dev.tofu.env` for dev destroys. Config-test and
-snapshot-test use the stricter saved-plan destruction procedures in
-[`proxmox-config-test-environment.md`](./proxmox-config-test-environment.md) and
-[`proxmox-snapshot-test-environment.md`](./proxmox-snapshot-test-environment.md),
-only after the owning acceptance workflow releases the fixtures and explicit
-review succeeds.
+Use `environments/dev` and `dev.tofu.env` for dev destroys. Config-test,
+snapshot-test, and migration-test use the stricter saved-plan destruction
+procedures in their respective
+[`config-test`](./proxmox-config-test-environment.md),
+[`snapshot-test`](./proxmox-snapshot-test-environment.md), and
+[`migration-test`](./proxmox-migration-test-environment.md) runbooks, only after
+the owning acceptance workflow releases the fixtures and explicit review
+succeeds.
 
 Prefer this over deleting VMs manually in Proxmox. Manual deletion leaves OpenTofu state stale and requires state repair.
 
@@ -499,6 +537,7 @@ make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=config-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=migration-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 Equivalent local checks with the default install path are:
@@ -508,6 +547,7 @@ make verify
 make verify ENV=dev
 make verify ENV=config-test
 make verify ENV=snapshot-test
+make verify ENV=migration-test
 ```
 
 ## Local Fallback Workflow
@@ -538,7 +578,9 @@ Secret-free CI validation can run on every pull request:
 make deps TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=config-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=migration-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 This validates formatting, initialization, and static OpenTofu configuration without private tfvars or Proxmox credentials.

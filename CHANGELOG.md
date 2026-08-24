@@ -7,7 +7,12 @@ and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-No unreleased changes.
+### Added
+
+- Added an independent two-VM `migration-test` root that provisions clean Rocky
+  Linux 10.0 and 10.1 baselines for consumer-owned migration testing.
+- Added saved-plan lifecycle, exact-version handoff, consumer reservation, and
+  teardown guidance while keeping guest mutation outside this repository.
 
 ## [1.6.0] - 2026-08-20
 

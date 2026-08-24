@@ -61,6 +61,7 @@ The maintained OpenTofu roots are independent:
 - `environments/dev` uses dev state and `dev.tfvars`.
 - `environments/config-test` uses disposable acceptance state and `config-test.tfvars`.
 - `environments/snapshot-test` uses disposable acceptance state and `snapshot-test.tfvars`.
+- `environments/migration-test` uses disposable acceptance state and `migration-test.tfvars`.
 
 Use native OpenTofu for `plan`, `apply`, and `destroy` from the selected environment root. Use Make targets from the repository root for setup, formatting, and validation helpers.
 
@@ -74,6 +75,11 @@ Live config-test acceptance additionally requires the validated Rocky Linux 10.1
 template, capacity for one disposable clone and its test disk, trusted console
 access for SSH host-key authentication, and an isolated `platform-config`
 inventory. See `proxmox-config-test-environment.md`.
+
+Live migration-test acceptance additionally requires validated Rocky Linux 10.0
+and 10.1 templates, capacity for two full clones, trusted console access for SSH
+host-key authentication, and a consumer that accepts the clean-baseline handoff.
+See `proxmox-migration-test-environment.md`.
 
 ## CI Requirements
 

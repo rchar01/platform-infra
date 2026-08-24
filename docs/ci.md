@@ -11,6 +11,7 @@ make verify TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=dev TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=config-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 make verify ENV=snapshot-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
+make verify ENV=migration-test TOFU_INSTALL_DIR="$PWD/.tools/bin"
 ```
 
 `make verify` installs the pinned OpenTofu binary through `make deps` when needed.
@@ -158,6 +159,9 @@ environments/homelab uses platform-private/infra/homelab.tfvars
 environments/dev uses platform-private/infra/dev.tfvars
 environments/config-test uses platform-private/infra/config-test.tfvars
 environments/snapshot-test uses platform-private/infra/snapshot-test.tfvars
+environments/migration-test uses platform-private/infra/migration-test.tfvars
 ```
 
-Never cross-use tfvars between roots. CI may initialize and validate either disposable root, but live guest mutation, reboot, snapshot, rollback, apply, and destroy remain explicitly approved acceptance operations.
+Never cross-use tfvars between roots. CI may initialize and validate any
+disposable root, but live guest mutation, reboot, snapshot, rollback, apply, and
+destroy remain explicitly approved acceptance operations.

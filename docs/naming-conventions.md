@@ -60,7 +60,8 @@ Use a per-VM `template_vm_id` override only when a specific VM intentionally use
 Every environment root adds these default tags:
 
 - `managed-by-tofu`.
-- The root environment name, such as `homelab`, `dev`, `config-test`, or `snapshot-test`.
+- The root environment name, such as `homelab`, `dev`, `config-test`,
+  `snapshot-test`, or `migration-test`.
 
 Do not repeat either default in per-VM tags. Add role-specific tags when useful,
 such as `disposable`, `monitoring`, or `k8s`.

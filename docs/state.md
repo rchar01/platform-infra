@@ -28,6 +28,7 @@ Each directory under `environments/` has independent state:
 - `environments/dev` uses dev state and `dev.tfvars`.
 - `environments/config-test` uses disposable acceptance state and `config-test.tfvars`.
 - `environments/snapshot-test` uses disposable acceptance state and `snapshot-test.tfvars`.
+- `environments/migration-test` uses disposable acceptance state and `migration-test.tfvars`.
 
 Do not switch independent VM sets by changing only the tfvars file inside one root. OpenTofu treats resources missing from the selected config as candidates for destruction.
 
@@ -55,9 +56,9 @@ Before CI apply is considered production-grade, add remote state with:
 - Separate state per environment root.
 
 Keep the environment invariant unchanged: every `environments/<env>` root uses
-only its matching `<env>.tfvars` and independent state. Retain config-test or
-snapshot-test state through successful destruction. For config-test, preserve
-the valid empty state afterward; empty state plus retained configuration is the
-expected idle condition, and a normal plan should intentionally propose one
-create. Never remove state as a substitute for destroying or reconciling a live
-VM.
+only its matching `<env>.tfvars` and independent state. Retain config-test,
+snapshot-test, and migration-test state through successful destruction. For
+config-test and migration-test, preserve the valid empty state afterward; empty
+state plus retained configuration is the expected idle condition, and a normal
+plan should intentionally propose the fixture's complete create set. Never
+remove state as a substitute for destroying or reconciling a live VM.

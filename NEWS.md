@@ -4,7 +4,15 @@ This file gives a short, release-oriented view of what changed between versions.
 
 ## Unreleased
 
-No unreleased changes.
+Rocky Linux migration baseline infrastructure.
+
+Highlights:
+
+- Added an isolated `migration-test` root with clean Rocky Linux 10.0 and 10.1
+  VMs for downstream migration tests.
+- Added a reviewed saved-plan and disposable lifecycle that preserves clean
+  baseline evidence at handoff while leaving all guest changes to the consuming
+  repository.
 
 ## v1.6.0 - 2026-08-20
 
