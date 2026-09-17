@@ -106,12 +106,18 @@ proxmox_api_token_file = "~/.config/platform-infrastructure/infra/proxmox.token"
 
 This avoids exporting the token into a long-lived shell environment. The private config repository may contain this file path, but must not contain the token value.
 
-Verify the token manually from the operator workstation when troubleshooting authentication:
+After following [Trust the Proxmox API Certificate](workflow.md#trust-the-proxmox-api-certificate), verify the token from the operator workstation. Use `PROXMOX_CA_FILE` for an explicit trusted CA file, or leave it unset to use system trust. The endpoint hostname or IP must appear in the API certificate. Do not send the token with `-k` or otherwise disable TLS verification:
 
 ```bash
-curl -kfsS \
-  -H "Authorization: PVEAPIToken=$(< ~/.config/platform-infrastructure/infra/proxmox.token)" \
-  https://<proxmox-ip>:8006/api2/json/version
+curl_tls_args=()
+if [[ -n "${PROXMOX_CA_FILE:-}" ]]; then
+  curl_tls_args+=(--cacert "$PROXMOX_CA_FILE")
+fi
+
+curl -fsS "${curl_tls_args[@]}" \
+  -H @<(printf 'Authorization: PVEAPIToken=%s\n' \
+    "$(< ~/.config/platform-infrastructure/infra/proxmox.token)") \
+  https://<proxmox-host>:8006/api2/json/version
 ```
 
 A successful response returns Proxmox version data. `401 Unauthorized` means Proxmox rejected the token identity or secret. This API check proves authentication only; OpenTofu VM operations still require sufficient Proxmox authorization.

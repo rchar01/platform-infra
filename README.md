@@ -14,31 +14,17 @@ Public examples use RFC 5737 documentation addresses from `192.0.2.0/24`; replac
 
 ## Start Here
 
-Read `docs/workflow.md` for the complete step-by-step workflow.
+Use the [workflow guide](docs/workflow.md) for private setup, plan/apply, environment switching, destruction, and CI. The [documentation index](docs/README.md) lists all runbooks and references.
 
-The canonical workflow guide covers:
+- [Requirements](docs/requirements.md): workstation, Proxmox, template, and CI prerequisites.
+- [API token setup](docs/proxmox-api-token.md) and [troubleshooting](docs/troubleshooting.md).
+- [Manual VM verification](docs/vm-manual-checks.md): post-apply checks before handoff.
+- [State](docs/state.md) and [CI](docs/ci.md): isolation and remote-state requirements.
+- [Publication checklist](docs/publication-checklist.md) and [license](LICENSE).
 
-- One-time local private setup.
-- Proxmox token-file setup.
-- Private tfvars and SSH key generation.
-- Homelab and dev plan/apply steps.
-- Environment switching rules.
-- Destroy steps.
-- Validation-only checks.
-- Local fallback testing.
-- CI validation, plan, and apply requirements.
+### Prerequisites
 
-Useful entry points:
-
-- `docs/workflow.md`: canonical runbook for all workflows.
-- `docs/requirements.md`: local, Proxmox, template, and CI prerequisites.
-- `docs/vm-manual-checks.md`: post-apply VM and SSH verification runbook.
-- `docs/proxmox-migration-test-environment.md`: disposable Rocky migration baseline lifecycle and handoff.
-- `docs/proxmox-api-token.md`: token creation and storage guidance.
-- `docs/publication-checklist.md`: public example and artifact review checklist.
-- `docs/state.md`: state isolation and remote-state requirements.
-- `docs/ci.md`: detailed CI reference.
-- `docs/troubleshooting.md`: common first-run failures.
+You need Git, Make, an SSH client, OpenTofu `>= 1.11.7`, an existing Proxmox template, a trusted API endpoint and token, and known target node, bridge, and datastores. The normal workflow also uses `../platform-private` and the setup helpers from [`platform-tools`](https://codeberg.org/rch/platform-tools). The OpenTofu installer needs `curl`, `unzip`, `awk`, and `sha256sum` or `shasum`.
 
 Install the pinned OpenTofu binary and inspect helper targets from the repository root:
 
@@ -47,7 +33,7 @@ make deps
 make help
 ```
 
-Initialization has three phases: install the repo-pinned OpenTofu binary with `make deps`, create private environment config and per-VM SSH keys, then run native `tofu init`, `validate`, and `plan` from the selected environment root. Use `TOFU_VERSION` or `TOFU_INSTALL_DIR` overrides when needed. See `docs/workflow.md#infra-initialization-summary` for the command sequence.
+Initialization has three phases: install the repo-pinned OpenTofu binary with `make deps`, create private environment config and per-VM SSH keys, then run native `tofu init`, `validate`, and `plan` from the selected environment root. Use `TOFU_VERSION` or `TOFU_INSTALL_DIR` overrides when needed. See the [initialization summary](docs/workflow.md#infra-initialization-summary) for the command sequence.
 
 Use Make targets from the repository root for setup, formatting, validation, and SSH key helpers. Use native `tofu` commands from the selected `environments/<env>` root for `plan`, `apply`, `destroy`, and output inspection after sourcing the matching private `.tofu.env` file.
 
@@ -81,94 +67,19 @@ platform-docs documents the design and operations across all repositories.
 
 ## Scope
 
-Simple boundary:
+`platform-infra` owns template cloning, VM names/IDs/tags, CPU/RAM/disks, node/datastore/bridge selection, the guest-agent flag, and OpenTofu handoff outputs. It stops at VM existence, virtual hardware, and initial access.
 
-```text
-platform-infra = VM exists with the right virtual hardware and initial access.
-platform-config = VM is configured after boot.
-```
-
-In scope:
-
-- Hostnames.
-- VM names and VM IDs.
-- Proxmox provider configuration.
-- VM cloning from an existing template.
-- CPU, RAM, boot disk size, and additional virtual disks.
-- Datastore, node, and network bridge selection.
-- Initial cloud-init user.
-- Per-VM SSH public key injection.
-- DHCP or static IP intent.
-- DNS server and search-domain intent.
-- VM tags and descriptions.
-- QEMU guest agent flag.
-- OpenTofu outputs for later configuration handoff.
-
-Out of scope:
-
-- Cloud image downloads.
-- `qm importdisk`.
-- Template creation.
-- OS package installation.
-- `fstab`.
-- NFS mounts.
-- Users beyond the initial cloud-init user.
-- Firewall rules inside the guest.
-- Docker or Podman setup.
-- Application configuration or deployment.
-- Systemd services.
-- Backup scripts inside VMs.
-- Certificates inside services.
-- Kubernetes access tooling or manifests.
-- Certificate authority generation.
-- Ansible roles or playbooks.
+Template preparation belongs in `platform-template-builder`; post-boot packages, users, guest storage, networking/firewalls, services, certificates, containers, and applications belong in `platform-config` or the appropriate downstream repository. See the [detailed boundaries](docs/requirements.md#repository-boundary).
 
 Cloud-init is intentionally minimal here. This repo may set hostname, initial user, SSH key, IP addressing, and DNS intent. Proxmox cloud-init automatic package upgrades are explicitly disabled; templates provide the initial guest release, and `platform-config` owns subsequent package lifecycle. Do not use cloud-init in this repo for complex OS configuration.
 
 ## Proxmox Disk Performance
 
-For Linux VMs on Proxmox, especially with ZFS-backed storage, the practical target shape is:
-
-- Host storage backed by a ZFS pool when that is the selected Proxmox storage design.
-- VM disks on zvol or raw block storage rather than qcow2 files on ZFS.
-- SCSI disk interfaces such as `scsi0` and `scsi1` with the `virtio-scsi-single` controller.
-- IO thread enabled for VM disks.
-- Discard/TRIM enabled so space reclamation can pass through to the underlying storage.
-- Disk cache set to `none` by default; use `writeback` only when the durability and power-loss tradeoffs are deliberate.
-- Guest filesystems such as XFS or ext4 for typical Linux workloads.
-
-Repository boundary still applies. `platform-infra` may own virtual disk shape, datastore selection, controller, cache, IO thread, and discard settings. `platform-template-builder` owns template image preparation. `platform-config` owns guest partitioning, formatting, filesystems, LVM, mounts, and `fstab`.
-
-The module now defaults to `scsi_hardware = "virtio-scsi-single"`, disk `iothread = true`, `discard = "on"`, `cache = "none"`, and `file_format = "raw"`. Environment roots expose defaults and per-VM overrides for those settings; additional disks can override cache, discard, file format, IO thread, and an optional guest-visible serial per disk.
-
-QEMU guest agent filesystem trim integration stays disabled by default with `default_agent_trim = false`. Enable it only when the template reliably installs and starts `qemu-guest-agent`, the guest filesystem stack supports fstrim safely, and the operator wants Proxmox-triggered guest fstrim in addition to disk-level discard. Inspect `tofu plan` carefully before applying these settings to existing VMs because disk/controller changes can require shutdowns or affect cloned disk attributes.
+See [disk defaults and performance guidance](docs/requirements.md#proxmox-disk-performance) for ZFS/raw storage, cache durability, discard versus guest fstrim, and existing-VM change warnings. Guest partitioning, filesystems, LVM, mounts, and `fstab` remain owned by `platform-config`.
 
 ## Private Workflow
 
-The normal operator workflow uses a sibling private repository for environment values:
-
-```text
-../platform-private/infra/
-  homelab.tfvars
-  dev.tfvars
-  config-test.tfvars
-  snapshot-test.tfvars
-  migration-test.tfvars
-  homelab.tofu.env
-  dev.tofu.env
-  config-test.tofu.env
-  snapshot-test.tofu.env
-  migration-test.tofu.env
-  config-test/
-    operator-overlay.md
-    evidence/
-  snapshot-test/
-    operator-overlay.md
-    evidence/
-  migration-test/
-    operator-overlay.md
-    evidence/
-```
+Keep non-secret environment values in `../platform-private/infra/<env>.tfvars` and matching `<env>.tofu.env` files. Disposable-fixture overlays and evidence live under `../platform-private/infra/<env>/`; their linked lifecycle runbooks define the details.
 
 Secrets and key material stay outside Git:
 
@@ -176,36 +87,24 @@ Secrets and key material stay outside Git:
 - SSH private keys: `~/.ssh`.
 - State files and plan files: ignored and not committed.
 
-The private workflow separates public code, private config, local secrets, SSH key material, and independent environment state. That separation supports production-style workflows, but production use still requires environment-specific controls such as remote state with locking, reviewed plans, least-privilege credentials, backups, monitoring, and change management.
-
-Follow `docs/workflow.md` for the exact commands.
+Follow the [private setup workflow](docs/workflow.md#one-time-local-private-setup) for exact commands. Production use still requires remote state with locking, reviewed plans, least-privilege credentials, backups, monitoring, and change management.
 
 ## Environments
 
 Each directory under `environments/` is an independent OpenTofu root with separate state.
 
-Current roots:
-
-- `environments/homelab`.
-- `environments/dev`.
-- `environments/config-test`, a disposable one-VM platform-config acceptance root.
-- `environments/snapshot-test`, a disposable two-VM acceptance root.
-- `environments/migration-test`, a disposable two-VM Rocky migration baseline root.
+| Root | Purpose |
+| --- | --- |
+| `homelab`, `dev` | Example platform environments. |
+| [`config-test`](docs/proxmox-config-test-environment.md) | One on-demand VM for isolated `platform-config` acceptance. |
+| [`snapshot-test`](docs/proxmox-snapshot-test-environment.md) | Two disposable VMs for `platform-proxmox-vm-snapshot` acceptance. |
+| [`migration-test`](docs/proxmox-migration-test-environment.md) | Clean Rocky 10.0 and 10.1 baselines for consumer-owned migration tests. |
 
 Each root must use only its matching tfvars and state. Switching VM sets inside one state root can make OpenTofu plan to destroy resources that disappeared from the selected config.
 
-The config-test root defines an on-demand one-VM fixture for isolated
-`platform-config` acceptance. Its configuration and empty state are reusable,
-but each live VM incarnation exists only for an approved campaign and is
-destroyed afterward. The snapshot-test root provisions two disposable
-VMs for live testing of `platform-proxmox-vm-snapshot`. The migration-test root
-provides clean Rocky 10.0 and 10.1 baselines for a consumer-owned test. Keep each
-root's state and private config for repeatability, but destroy its VMs after
-acceptance. See `docs/proxmox-config-test-environment.md`,
-`docs/proxmox-snapshot-test-environment.md`, and
-`docs/proxmox-migration-test-environment.md`.
+Disposable fixtures exist only for approved campaigns: follow their linked runbooks for stricter saved-plan approval, handoff, and destruction gates. Keep them out of normal service inventories. Destroy their VMs after acceptance while retaining private config and state for repeatability; config-test is normally absent with valid empty state.
 
-To remove managed VMs, use the destroy workflow in `docs/workflow.md` from the selected environment root. Do not delete OpenTofu-managed VMs manually in Proxmox unless you are intentionally repairing state.
+To remove managed VMs, use the [destroy workflow](docs/workflow.md#destroy) from the selected environment root. Do not delete OpenTofu-managed VMs manually in Proxmox unless you are intentionally repairing state.
 
 ## Secrets Policy
 
@@ -219,4 +118,8 @@ Secret-free validation can run on every pull request with `make verify` for each
 
 CI apply is not production-grade with ephemeral local state. Add remote state with encryption, access control, and locking before using CI apply.
 
-See `docs/workflow.md` for workflow steps and `docs/ci.md` for detailed CI guidance.
+See the [workflow guide](docs/workflow.md) for steps and [CI reference](docs/ci.md) for details.
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

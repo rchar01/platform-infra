@@ -110,6 +110,24 @@ If the current template does not have a working guest agent, set `agent_enabled 
 
 Without a working guest agent, OpenTofu can still provision the VM, but guest-reported IP outputs may be empty.
 
+## Proxmox Disk Performance
+
+For Linux VMs on Proxmox, especially with ZFS-backed storage, the practical target shape is:
+
+- Host storage backed by a ZFS pool when that is the selected Proxmox storage design.
+- VM disks on zvol or raw block storage rather than qcow2 files on ZFS.
+- SCSI disk interfaces such as `scsi0` and `scsi1` with the `virtio-scsi-single` controller.
+- IO thread enabled for VM disks.
+- Discard/TRIM enabled so space reclamation can pass through to the underlying storage.
+- Disk cache set to `none` by default; use `writeback` only when the durability and power-loss tradeoffs are deliberate.
+- Guest filesystems such as XFS or ext4 for typical Linux workloads.
+
+Repository boundary still applies. `platform-infra` may own virtual disk shape, datastore selection, controller, cache, IO thread, and discard settings. `platform-template-builder` owns template image preparation. `platform-config` owns guest partitioning, formatting, filesystems, LVM, mounts, and `fstab`.
+
+The module defaults to `scsi_hardware = "virtio-scsi-single"`, disk `iothread = true`, `discard = "on"`, `cache = "none"`, and `file_format = "raw"`. Environment roots expose defaults and per-VM overrides for those settings; additional disks can override cache, discard, file format, IO thread, and an optional guest-visible serial per disk.
+
+QEMU guest agent filesystem trim integration stays disabled by default with `default_agent_trim = false`. Enable it only when the template reliably installs and starts `qemu-guest-agent`, the guest filesystem stack supports fstrim safely, and the operator wants Proxmox-triggered guest fstrim in addition to disk-level discard. Inspect `tofu plan` carefully before applying these settings to existing VMs because disk/controller changes can require shutdowns or affect cloned disk attributes.
+
 ## Memory Ballooning
 
 The VM module treats `memory_mb` as the Proxmox maximum memory value. Set optional `memory_floating_mb` per VM to configure the Proxmox ballooned minimum memory value.
